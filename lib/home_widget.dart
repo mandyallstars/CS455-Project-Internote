@@ -1,30 +1,41 @@
 import 'package:flutter/material.dart';
-import 'placeholder_widget.dart';
+import 'stack_index.dart';
+import 'package:inter_note/screens/profile.dart';
+import 'package:inter_note/screens/courses.dart';
+import 'package:inter_note/screens/notes.dart';
+import 'package:inter_note/screens/notesScreens/notes_body.dart';
+import 'package:inter_note/screens/notesScreens/notes_list.dart';
 
-class Home extends StatefulWidget {
+class HomePage extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() {
-    return _HomeState();
-  }
+  _HomePageState createState() => _HomePageState();
 }
 
-class _HomeState extends State<Home> {
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin<HomePage> {
   int _currentIndex = 0;
-  final List<Widget> _children = [
-    PlaceholderWidget(Colors.white),
-    PlaceholderWidget(Colors.deepOrange),
-    PlaceholderWidget(Colors.green)
-  ];
+
+  Widget callPage(int currentIndex) {
+    switch(currentIndex) {
+      case 0: return Profile();
+      case 1: return Courses();
+      case 2: return NotesList();
+
+      break;
+      default: return Notes();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('My Flutter App'),
-      ),
-      body: _children[_currentIndex],
+      body: callPage(_currentIndex),
+      //body: _children[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
-        onTap: onTabTapped,
         currentIndex: _currentIndex,
+        onTap: (int index) {
+          _currentIndex = index;
+          setState(() {});
+        },
         items: [
           BottomNavigationBarItem(
             icon: new Icon(Icons.person),
@@ -41,14 +52,4 @@ class _HomeState extends State<Home> {
       ),
     );
   }
-
-
-  void onTabTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
-  }
-
 }
-
-
