@@ -14,6 +14,8 @@ class CoursesState extends State<Courses> {
 
   int _coursesCount = 10;
 
+  final TextEditingController _searchBarController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -38,16 +40,33 @@ class CoursesState extends State<Courses> {
       child: ListView(
         children: <Widget>[
           Padding(
-              padding: EdgeInsets.only(
-                  top: _minimumPadding, bottom: _minimumPadding),
-              child: Text(
-                "Search Bar Placeholder",
-                textDirection: TextDirection.ltr,
-                style: TextStyle(
-                  fontSize: 15.0,
-                  color: Colors.black,
-                ),
-              )),
+            padding:
+                EdgeInsets.only(top: _minimumPadding, bottom: _minimumPadding),
+            child: TextField(
+              controller: _searchBarController,
+              style: TextStyle(fontSize: 15.0),
+              decoration: InputDecoration(
+                  contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+                  prefixIcon: IconButton(
+                    icon: Icon(Icons.search),
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(Icons.clear),
+                    onPressed: () {
+                      WidgetsBinding.instance.addPostFrameCallback(
+                          (_) => _searchBarController.clear());
+                    },
+                  ),
+                  hintText: "Search...",
+                  border: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white, width: 32.0),
+                      borderRadius: BorderRadius.circular(20.0)),
+                  focusedBorder: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Colors.grey[300], width: 32.0),
+                      borderRadius: BorderRadius.circular(20.0))),
+            ),
+          ),
           Padding(
               padding: EdgeInsets.only(
                   top: _minimumPadding, bottom: _minimumPadding),

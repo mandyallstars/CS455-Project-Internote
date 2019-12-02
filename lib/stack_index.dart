@@ -10,41 +10,116 @@ class Destination {
 
 const List<Destination> allDestinations = <Destination>[
   Destination('Profile', Icons.person, Colors.white),
-  Destination('Courses', Icons.school, Colors.white),
-  Destination('Notes', Icons.description, Colors.white),
+  Destination('Courses', Icons.school, Colors.blue),
+  Destination('Notes', Icons.description, Colors.purple),
 ];
 
-class DestinationView extends StatefulWidget {
-  const DestinationView({Key key, this.destination}) : super(key: key);
+class RootPage extends StatelessWidget {
+  const RootPage({Key key, this.destination}) : super(key: key);
+
   final Destination destination;
 
   @override
-  _DestinationViewState createState() => _DestinationViewState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        iconTheme: IconThemeData(
+          color: Colors.black,
+        ),
+        title: Text(destination.title, style: TextStyle(color: Colors.black),),
+        backgroundColor: destination.color,
+      ),
+      backgroundColor: destination.color,
+      body: SizedBox.expand(
+        child: InkWell(
+          onTap: () {
+            Navigator.pushNamed(context, "/list");
+          },
+        ),
+      ),
+    );
+  }
 }
 
-class _DestinationViewState extends State<DestinationView> {
+class ListPage extends StatelessWidget {
+  const ListPage({Key key, this.destination}) : super(key: key);
+
+  final Destination destination;
+
+  @override
+  Widget build(BuildContext context) {
+    const List<int> shades = <int>[50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
+    // TODO: implement build
+    return Scaffold (
+      appBar: AppBar(
+        iconTheme: IconThemeData(
+          color: Colors.black,
+        ),
+        title: Text(destination.title, style: TextStyle(color: Colors.black)),
+        backgroundColor: destination.color,
+      ),
+      backgroundColor: destination.color,
+      body: SizedBox.expand(
+        child: ListView.builder(
+          itemCount: shades.length,
+          itemBuilder: (BuildContext context, int index) {
+            return SizedBox(
+              height: 128,
+              child: Card(
+                color: destination.color,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, "/text");
+                  },
+                  child: Center(
+                    child: Text('Item $index', style: TextStyle(color: Colors.black)),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class TextPage extends StatefulWidget {
+  const TextPage({Key key, this.destination}) : super(key: key);
+
+  final Destination destination;
+
+  @override
+  _TextPageState createState() => _TextPageState();
+}
+
+class _TextPageState extends State<TextPage> {
   TextEditingController _textController;
 
   @override
   void initState() {
     super.initState();
-    _textController = TextEditingController(
+    _textController = TextEditingController (
       text: 'sample text: ${widget.destination.title}',
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    // TODO: implement build
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.destination.title}'),
+        iconTheme: IconThemeData(
+          color: Colors.black,
+        ),
+        title: Text(widget.destination.title, style: TextStyle(color: Colors.black),),
         backgroundColor: widget.destination.color,
       ),
       backgroundColor: widget.destination.color,
       body: Container(
         padding: const EdgeInsets.all(32.0),
         alignment: Alignment.center,
-        child: TextField(controller: _textController,),
+        child: TextField(controller: _textController, style: TextStyle(color: Colors.black),),
       ),
     );
   }
@@ -57,42 +132,34 @@ class _DestinationViewState extends State<DestinationView> {
 
 }
 
+class DestinationView extends StatefulWidget {
+  const DestinationView({Key key, this.destination}) : super(key: key);
+  final Destination destination;
 
-class HomePage extends StatefulWidget {
   @override
-  _HomePageState createState() => _HomePageState();
+  _DestinationViewState createState() => _DestinationViewState();
 }
 
-class _HomePageState extends State<HomePage> with TickerProviderStateMixin<HomePage> {
-  int _currentIndex = 0;
+class _DestinationViewState extends State<DestinationView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        top: false,
-        child: IndexedStack(
-          index: _currentIndex,
-          children: allDestinations.map<Widget>((Destination destination) {
-            return DestinationView(destination: destination);
-          }).toList(),
-        ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (int index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        items: allDestinations.map((Destination destination) {
-          return BottomNavigationBarItem(
-              icon: Icon(destination.icon),
-              backgroundColor: destination.color,
-              title: Text(destination.title)
-          );
-        }).toList(),
-      ),
+    return Navigator(
+      onGenerateRoute: (RouteSettings settings) {
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (BuildContext context) {
+            switch(settings.name) {
+              case '/':
+                return RootPage(destination: widget.destination);
+              case '/list':
+                return ListPage(destination: widget.destination);
+              case '/text':
+                return TextPage(destination: widget.destination);
+            }
+          },
+        );
+      },
     );
   }
 }

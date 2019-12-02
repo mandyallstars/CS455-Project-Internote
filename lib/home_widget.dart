@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'stack_index.dart';
 import 'package:inter_note/screens/profile.dart';
 import 'package:inter_note/screens/courses.dart';
 import 'package:inter_note/screens/notes.dart';
 import 'package:inter_note/screens/notesScreens/notes_body.dart';
 import 'package:inter_note/screens/notesScreens/notes_list.dart';
+import 'package:inter_note/screens/profileScreens/school_select.dart';
+import 'package:inter_note/screens/coursesScreens/add_course.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -17,8 +18,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin<HomeP
   Widget callPage(int currentIndex) {
     switch(currentIndex) {
       case 0: return Profile();
-      case 1: return Courses();
-      case 2: return NotesList();
+      case 1: return AddCourse();
+      case 2: return Notes();
 
       break;
       default: return Notes();
@@ -42,7 +43,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin<HomeP
             title: new Text("Profile"),
           ),
           BottomNavigationBarItem(
-            icon: new Icon(Icons.school),
+            icon: new Icon(Icons.library_books),
             title: new Text("Courses"),
           ),BottomNavigationBarItem(
             icon: new Icon(Icons.description),

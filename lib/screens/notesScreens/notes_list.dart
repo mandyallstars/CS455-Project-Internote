@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:inter_note/screens/notes.dart';
-import 'notes_body.dart';
+import 'package:inter_note/screens/notesScreens/notes_body.dart';
 
 class NotesList extends StatefulWidget {
   @override

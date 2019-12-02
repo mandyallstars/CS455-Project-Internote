@@ -12,16 +12,21 @@ class App extends StatefulWidget {
 }
 
 class AppState extends State<App> {
-
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Internote',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primaryColor: Colors.blueAccent
-      ),
-      home: HomePage(),
-    );
+    return GestureDetector(
+        onTap: () {
+          FocusScopeNode currentFocus = FocusScope.of(context);
+
+          if (!currentFocus.hasPrimaryFocus) {
+            currentFocus.unfocus();
+          }
+        },
+        child: MaterialApp(
+          title: 'Internote',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(primaryColor: Colors.blueAccent),
+          home: HomePage(),
+        ));
   }
 }
