@@ -4,6 +4,9 @@ import 'package:inter_note/screens/notesScreens/notes_list.dart';
 import 'package:inter_note/screens/notesScreens/notes_body.dart';
 
 class Notes extends StatefulWidget {
+
+  const Notes({Key key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() {
     return NotesState();
@@ -16,13 +19,12 @@ class NotesState extends State<Notes> {
   int _count = 10;
 
   final TextEditingController _searchBarController = TextEditingController();
+  final TextEditingController _semesterYearController = TextEditingController();
 
   var semesterValue = [
-    'Fall 2019',
-    'Winter 2020',
-    'Spring Summer 2020',
-    'Fall 2020',
-    'Winter 2021'
+    'Fall',
+    'Winter',
+    'Spring Summer',
   ];
 
   @override
@@ -89,26 +91,14 @@ class NotesState extends State<Notes> {
 
   Padding getSemesterInfo() {
     return Padding(
-      padding: EdgeInsets.only(
-        top: _minimumPadding,
-        bottom: _minimumPadding,
-      ),
+      padding: EdgeInsets.fromLTRB(_minimumPadding * 3, _minimumPadding, _minimumPadding * 3, _minimumPadding),
       child: Row(
         children: <Widget>[
-          Expanded(
-              child: Text(
-            "Semester",
-            textAlign: TextAlign.center,
-            textDirection: TextDirection.ltr,
-            style: TextStyle(
-                fontSize: 25.0,
-                color: Colors.black,
-                fontWeight: FontWeight.bold),
-          )),
           Expanded(
               child: DropdownButton(
             isExpanded: true,
             elevation: 10,
+            iconEnabledColor: Colors.black,
             items: semesterValue.map((String semesterDropDownItem) {
               return DropdownMenuItem<String>(
                 value: semesterDropDownItem,
@@ -116,13 +106,32 @@ class NotesState extends State<Notes> {
                     style: TextStyle(fontSize: 20.0)),
               );
             }).toList(),
-            value: 'Fall 2019',
+            hint: Text('Semester', style: TextStyle(fontSize: 20)),
             onChanged: (semesterDropDownItem) {
               setState(() {
                 debugPrint("User selected $semesterDropDownItem");
               });
             },
           )),
+          Container(
+            padding: EdgeInsets.only(
+                left: _minimumPadding * 2,
+                right: _minimumPadding * 2),
+          ),
+          Expanded(
+            child: TextFormField(
+              maxLength: 4,
+              maxLengthEnforced: true,
+              textAlign: TextAlign.center,
+              keyboardType: TextInputType.numberWithOptions(
+                  signed: false, decimal: false),
+              controller: _semesterYearController,
+              style: TextStyle(fontSize: 20),
+              decoration: InputDecoration(
+                  labelText: "Year E.g. 2019",
+                  counter: Offstage()),
+            ),
+          ),
         ],
       ),
     );
@@ -146,10 +155,18 @@ class NotesState extends State<Notes> {
             trailing: Icon(Icons.arrow_forward_ios, color: Colors.blue),
             onTap: () {
               debugPrint("ListTile Tapped");
+              navigateToNotesList('This Course Title');
             },
           ),
         );
       },
     );
   }
+
+  void navigateToNotesList(String appBarTitle) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return NotesList(appBarTitle);
+    }));
+  }
+
 }

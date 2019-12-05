@@ -16,13 +16,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin<HomeP
   int _currentIndex = 0;
 
   Widget callPage(int currentIndex) {
-    switch(currentIndex) {
-      case 0: return Profile();
-      case 1: return AddCourse();
-      case 2: return Notes();
+    switch (currentIndex) {
+      case 0:
+        return Profile();
+      case 1:
+        return Courses();
+      case 2:
+        return Notes();
 
-      break;
-      default: return Notes();
+        break;
+      default:
+        return Notes();
     }
   }
 
@@ -34,8 +38,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin<HomeP
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (int index) {
-          _currentIndex = index;
-          setState(() {});
+          setState(() {
+            _currentIndex = index;
+          });
         },
         items: [
           BottomNavigationBarItem(
@@ -45,7 +50,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin<HomeP
           BottomNavigationBarItem(
             icon: new Icon(Icons.library_books),
             title: new Text("Courses"),
-          ),BottomNavigationBarItem(
+          ),
+          BottomNavigationBarItem(
             icon: new Icon(Icons.description),
             title: new Text("Notes"),
           ),

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:inter_note/screens/coursesScreens/add_course.dart';
 
 class Courses extends StatefulWidget {
+  const Courses({Key key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
@@ -20,18 +23,19 @@ class CoursesState extends State<Courses> {
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Courses'),
-      ),
-      body: getCoursesPage(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          debugPrint("FAB pressed");
-        },
-        tooltip: 'Add Course',
-        child: Icon(Icons.add),
-      ),
-    );
+        appBar: AppBar(
+          title: Text('Courses'),
+        ),
+        body: getCoursesPage(),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            debugPrint("FAB pressed");
+            navigateToAddCourse('Add Course');
+          },
+          tooltip: 'Add Course',
+          child: Icon(Icons.add),
+        ),
+      );
   }
 
   Container getCoursesPage() {
@@ -103,9 +107,17 @@ class CoursesState extends State<Courses> {
               trailing: Icon(Icons.delete, color: Colors.grey),
               onTap: () {
                 debugPrint("Course ListTile Tapped");
+                navigateToAddCourse('Edit Course');
               },
             ),
           );
         });
   }
+
+  void navigateToAddCourse(String appBarTitle) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return AddCourse(appBarTitle);
+    }));
+  }
+
 }

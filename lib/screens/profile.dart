@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:inter_note/screens/profileScreens/school_select.dart';
 
 class Profile extends StatefulWidget {
+
+  const Profile({Key key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
@@ -53,6 +57,7 @@ class ProfileState extends State<Profile> {
           TextField(
             controller: _nameController,
             focusNode: _nameFocusNode,
+            style: TextStyle(fontSize: 20),
             decoration: InputDecoration(
                 labelText: "Name",
                 suffixIcon: IconButton(
@@ -128,6 +133,7 @@ class ProfileState extends State<Profile> {
       ),
       onTap: () {
         debugPrint("School tapped");
+        navigateToSchoolList('Edit School');
       },
     );
   }
@@ -165,4 +171,11 @@ class ProfileState extends State<Profile> {
       child: image,
     );
   }
+
+  void navigateToSchoolList(String appBarTitle) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return SchoolList(appBarTitle);
+    }));
+  }
+
 }

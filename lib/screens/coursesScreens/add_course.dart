@@ -2,14 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 class AddCourse extends StatefulWidget {
+  String appBarTitle;
+
+  AddCourse(this.appBarTitle);
+
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
-    return AddCourseState();
+    return AddCourseState(appBarTitle);
   }
 }
 
 class AddCourseState extends State<AddCourse> {
+  String appBarTitle;
+
+  AddCourseState(this.appBarTitle);
+
   final _minimumPadding = 5.0;
 
   final TextEditingController _searchBarController = TextEditingController();
@@ -36,20 +44,30 @@ class AddCourseState extends State<AddCourse> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Add Course"),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.clear),
-            iconSize: 40,
+    return WillPopScope(
+      onWillPop: () {
+        navigateToPreviousScreen();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(appBarTitle),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
             onPressed: () {
-              debugPrint("User Pressed Clear Button");
+              navigateToPreviousScreen();
             },
           ),
-        ],
-      ),
-      body: getCourseAddForm(),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.clear),
+              iconSize: 40,
+              onPressed: () {
+                debugPrint("User Pressed Clear Button");
+              },
+            ),
+          ],
+        ),
+        body: getCourseAddForm(),
 //      floatingActionButton: FloatingActionButton.extended(
 //        icon: Icon(Icons.add),
 //        label: Text('Add Course'),
@@ -57,6 +75,7 @@ class AddCourseState extends State<AddCourse> {
 //          debugPrint("Add Course Button Pressed");
 //        },
 //      ),
+      ),
     );
   }
 
@@ -111,15 +130,19 @@ class AddCourseState extends State<AddCourse> {
                             child: DropdownButton(
                               isExpanded: true,
                               elevation: 10,
+                              iconEnabledColor: Colors.black,
                               items: _semesterValue
                                   .map((String semesterDropDownItem) {
                                 return DropdownMenuItem<String>(
                                   value: semesterDropDownItem,
                                   child: Text(semesterDropDownItem,
-                                      style: TextStyle(fontSize: 25.0)),
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(fontSize: 20.0)),
                                 );
                               }).toList(),
-                              value: 'Fall',
+                              hint: Text('Semester',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: 20)),
                               onChanged: (semesterDropDownItem) {
                                 setState(() {
                                   debugPrint(
@@ -137,12 +160,15 @@ class AddCourseState extends State<AddCourse> {
                             child: TextFormField(
                               maxLength: 4,
                               maxLengthEnforced: true,
+                              style: TextStyle(fontSize: 20),
+                              textAlign: TextAlign.center,
                               keyboardType: TextInputType.numberWithOptions(
                                   signed: false, decimal: false),
                               controller: _semesterYearController,
                               decoration: InputDecoration(
-                                  labelText: "Year E.g. 2019",
-                                  counter: Offstage()),
+                                labelText: "Year E.g. 2019",
+                                counter: Offstage(),
+                              ),
                             ),
                           ),
                         ],
@@ -150,21 +176,25 @@ class AddCourseState extends State<AddCourse> {
                   TextFormField(
                     controller: _courseNameController,
                     decoration: InputDecoration(labelText: "Course Name"),
+                    style: TextStyle(fontSize: 20),
                   ),
                   TextFormField(
                     controller: _courseNumberController,
                     decoration:
                         InputDecoration(labelText: "Course Number E.g. CS 100"),
+                    style: TextStyle(fontSize: 20),
                   ),
                   TextFormField(
                     controller: _courseSectionController,
                     decoration: InputDecoration(
                         labelText: "Course Section E.g. 001 or A"),
+                    style: TextStyle(fontSize: 20),
                   ),
                   TextFormField(
                     controller: _instructorNameController,
                     decoration: InputDecoration(
                         labelText: "Instructor's Name E.g. John Smith"),
+                    style: TextStyle(fontSize: 20),
                   ),
                   Row(
                     children: <Widget>[
@@ -172,23 +202,30 @@ class AddCourseState extends State<AddCourse> {
                         child: TextFormField(
                           maxLength: 2,
                           maxLengthEnforced: true,
+                          style: TextStyle(fontSize: 20),
+                          textAlign: TextAlign.center,
                           keyboardType: TextInputType.numberWithOptions(
                               signed: false, decimal: false),
                           controller: _timeFromHourController,
                           decoration: InputDecoration(
-                              labelText: "01", counter: Offstage()),
+                              hintText: "01", counter: Offstage()),
                         ),
                       ),
-                      Text(" : "),
+                      Text(" : ",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 25)),
                       Expanded(
                         child: TextFormField(
                           maxLength: 2,
                           maxLengthEnforced: true,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 20),
                           keyboardType: TextInputType.numberWithOptions(
                               signed: false, decimal: false),
                           controller: _timeFromMinuteController,
                           decoration: InputDecoration(
-                              labelText: "15", counter: Offstage()),
+                              hintText: "15", counter: Offstage()),
                         ),
                       ),
                       Expanded(
@@ -198,11 +235,18 @@ class AddCourseState extends State<AddCourse> {
                           items: _amPmValue.map((String amPmItem) {
                             return DropdownMenuItem<String>(
                               value: amPmItem,
-                              child: Text(amPmItem,
-                                  style: TextStyle(fontSize: 15.0)),
+                              child: Text(
+                                amPmItem,
+                                style: TextStyle(fontSize: 15),
+                                textAlign: TextAlign.center,
+                              ),
                             );
                           }).toList(),
-                          value: 'PM',
+                          hint: Text(
+                            "PM",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 15),
+                          ),
                           onChanged: (semesterDropDownItem) {
                             setState(() {
                               debugPrint("User selected $semesterDropDownItem");
@@ -211,28 +255,36 @@ class AddCourseState extends State<AddCourse> {
                         ),
                       ),
                       Text(" to ",
+                          textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.black, fontSize: 20)),
                       Expanded(
                         child: TextFormField(
                           maxLength: 2,
                           maxLengthEnforced: true,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 20),
                           keyboardType: TextInputType.numberWithOptions(
                               signed: false, decimal: false),
                           controller: _timeToHourController,
                           decoration: InputDecoration(
-                              labelText: "01", counter: Offstage()),
+                              hintText: "01", counter: Offstage()),
                         ),
                       ),
-                      Text(" : "),
+                      Text(" : ",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 20)),
                       Expanded(
                         child: TextFormField(
                           maxLength: 2,
                           maxLengthEnforced: true,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 20),
                           keyboardType: TextInputType.numberWithOptions(
                               signed: false, decimal: false),
                           controller: _timeToMinuteController,
                           decoration: InputDecoration(
-                              labelText: "15", counter: Offstage()),
+                              hintText: "15", counter: Offstage()),
                         ),
                       ),
                       Expanded(
@@ -242,11 +294,18 @@ class AddCourseState extends State<AddCourse> {
                           items: _amPmValue.map((String amPmItem) {
                             return DropdownMenuItem<String>(
                               value: amPmItem,
-                              child: Text(amPmItem,
-                                  style: TextStyle(fontSize: 15.0)),
+                              child: Text(
+                                amPmItem,
+                                style: TextStyle(fontSize: 15),
+                                textAlign: TextAlign.center,
+                              ),
                             );
                           }).toList(),
-                          value: 'PM',
+                          hint: Text(
+                            "PM",
+                            style: TextStyle(fontSize: 15),
+                            textAlign: TextAlign.center,
+                          ),
                           onChanged: (semesterDropDownItem) {
                             setState(() {
                               debugPrint("User selected $semesterDropDownItem");
@@ -264,7 +323,10 @@ class AddCourseState extends State<AddCourse> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20.0),
                       ),
-                      child: Text("ADD COURSE"),
+                      child: Text(
+                        "ADD COURSE",
+                        style: TextStyle(fontSize: 17),
+                      ),
                       color: Colors.blue,
                       textColor: Colors.white,
                       splashColor: Colors.green,
@@ -280,5 +342,9 @@ class AddCourseState extends State<AddCourse> {
         ],
       ),
     );
+  }
+
+  void navigateToPreviousScreen() {
+    Navigator.pop(context);
   }
 }

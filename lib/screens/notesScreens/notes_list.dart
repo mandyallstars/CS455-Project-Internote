@@ -3,30 +3,52 @@ import 'package:inter_note/screens/notes.dart';
 import 'package:inter_note/screens/notesScreens/notes_body.dart';
 
 class NotesList extends StatefulWidget {
+
+  String appBarTitle;
+
+  NotesList(this.appBarTitle);
+
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
-    return NotesListState();
+    return NotesListState(appBarTitle);
   }
 }
 
 class NotesListState extends State<NotesList> {
+
+  String appBarTitle;
+
+  NotesListState(this.appBarTitle);
+
   int notesCount = 10;
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Course Title Placeholder"),
-      ),
-      body: getNotesList(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          debugPrint("FAB pressed");
-        },
-        tooltip: 'Add Note',
-        child: Icon(Icons.add),
+    return WillPopScope(
+      onWillPop: () {
+        navigateToPreviousScreen();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(appBarTitle),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              navigateToPreviousScreen();
+            },
+          ),
+        ),
+        body: getNotesList(),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            debugPrint("FAB pressed");
+            navigateToNotesBody('New Note');
+          },
+          tooltip: 'Add Note',
+          child: Icon(Icons.add),
+        ),
       ),
     );
   }
@@ -50,10 +72,21 @@ class NotesListState extends State<NotesList> {
             ),
             onTap: () {
               debugPrint("Notes Card Tapped");
+              navigateToNotesBody('Note Title');
             },
           ),
         );
       },
     );
+  }
+
+  void navigateToNotesBody(String notesBodyBarTitle) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return NotesBody(notesBodyBarTitle);
+    }));
+  }
+
+  void navigateToPreviousScreen() {
+    Navigator.pop(context);
   }
 }
