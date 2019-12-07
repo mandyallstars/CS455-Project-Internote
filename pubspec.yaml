@@ -17,6 +17,11 @@ environment:
   sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
+  cloud_firestore:
+  firebase_auth:
+  google_sign_in: ^4.0.14
+  http:
+  flutter_auth_buttons:
   flutter:
     sdk: flutter
 
@@ -27,6 +32,9 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  sqflite: any
+  path_provider: any
+  intl: ^0.16.0
 
 
 # For information on the generic Dart part of this file, see the
@@ -43,6 +51,8 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - images/profilePhotoPlaceholder.png
+    - images/googleSignIn.png
+    - images/internoteLogo.png
   #  - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

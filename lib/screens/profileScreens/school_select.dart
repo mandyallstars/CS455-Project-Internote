@@ -57,7 +57,7 @@ class _SchoolListState extends State<SchoolList> {
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
                         Padding(
-                          padding: EdgeInsets.all(8.0),
+                          padding: EdgeInsets.all(_minimumPadding * 1.5),
                           child: TextFormField(
                             textAlign: TextAlign.center,
                             style: TextStyle(fontSize: 20),
@@ -66,7 +66,7 @@ class _SchoolListState extends State<SchoolList> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: EdgeInsets.all(_minimumPadding * 1.5),
                           child: Row(
                             children: <Widget>[
                               Expanded(
@@ -100,7 +100,7 @@ class _SchoolListState extends State<SchoolList> {
                                   textColor: Colors.white,
                                   splashColor: Colors.red,
                                   onPressed: () {
-                                    debugPrint("Cancel Button Pressed");
+                                    Navigator.of(context, rootNavigator: true).pop();
                                   },
                                 ),
                               ),

@@ -62,7 +62,7 @@ class AddCourseState extends State<AddCourse> {
               icon: Icon(Icons.clear),
               iconSize: 40,
               onPressed: () {
-                debugPrint("User Pressed Clear Button");
+                Navigator.of(context).pop();
               },
             ),
           ],
@@ -317,7 +317,7 @@ class AddCourseState extends State<AddCourse> {
                   ),
                   Divider(color: Colors.white),
                   Container(
-                    margin: EdgeInsets.only(left: 100, right: 100),
+                    margin: EdgeInsets.only(left: _minimumPadding*20, right: _minimumPadding*20),
                     child: RaisedButton(
                       //padding: EdgeInsets.only(left: 40, right: 40),
                       shape: RoundedRectangleBorder(
@@ -345,6 +345,6 @@ class AddCourseState extends State<AddCourse> {
   }
 
   void navigateToPreviousScreen() {
-    Navigator.pop(context);
+    Navigator.of(context).pop();
   }
 }

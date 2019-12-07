@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class NotesBody extends StatefulWidget {
-
   String notesBodyBarTitle;
 
   NotesBody(this.notesBodyBarTitle);
@@ -15,7 +14,6 @@ class NotesBody extends StatefulWidget {
 }
 
 class NotesBodyState extends State<NotesBody> {
-
   String notesBodyBarTitle;
 
   NotesBodyState(this.notesBodyBarTitle);
@@ -96,15 +94,18 @@ class NotesBodyState extends State<NotesBody> {
             children: <Widget>[
               Expanded(
                 child: Container(
-                 // margin: EdgeInsets.only(left: 25),
-                ),
+                    // margin: EdgeInsets.only(left: 25),
+                    ),
               ),
               Expanded(
                 child: Text(
                   "Lecture",
                   textAlign: TextAlign.center,
                   textDirection: TextDirection.ltr,
-                  style: TextStyle(fontSize: 20.0, color: Colors.black, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      fontSize: 20.0,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold),
                 ),
               ),
               Expanded(
@@ -116,18 +117,16 @@ class NotesBodyState extends State<NotesBody> {
                       signed: false, decimal: false),
                   controller: _lectureNumberController,
                   textDirection: TextDirection.rtl,
-                  inputFormatters: [
-                    LengthLimitingTextInputFormatter(3)
-                  ],
+                  inputFormatters: [LengthLimitingTextInputFormatter(3)],
                   style: TextStyle(fontSize: 20),
-                  decoration: InputDecoration(
-                      hintText: "999", counter: Offstage()),
+                  decoration:
+                      InputDecoration(hintText: "999", counter: Offstage()),
                 ),
               ),
               Expanded(
                 child: Container(
-                  //margin: EdgeInsets.only(right: 25),
-                ),
+                    //margin: EdgeInsets.only(right: 25),
+                    ),
               ),
             ],
           ),
@@ -136,16 +135,19 @@ class NotesBodyState extends State<NotesBody> {
           padding:
               EdgeInsets.only(left: 15.0, right: 15.0, top: 10.0, bottom: 10.0),
           child: TextField(
-              controller: noteTitleController,
+            maxLength: 50,
+            maxLengthEnforced: true,
+            controller: noteTitleController,
             style: TextStyle(fontSize: 20),
-              decoration: InputDecoration(
-                  labelText: "Topic",
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(4.0))),
-              onChanged: (noteTitleValue) {
-                debugPrint("User entered $noteTitleValue");
-              },
-            ),
+            decoration: InputDecoration(
+                labelText: "Topic",
+                counter: Offstage(),
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(4.0))),
+            onChanged: (noteTitleValue) {
+              debugPrint("User entered $noteTitleValue");
+            },
+          ),
         ),
         Divider(color: Colors.black54),
         Padding(
