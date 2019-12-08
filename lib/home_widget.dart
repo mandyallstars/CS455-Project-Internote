@@ -19,6 +19,7 @@ class NavigationStack extends StatefulWidget {
     // TODO: implement createState
     return NavigationStackState(this.child);
   }
+
 }
 
 class NavigationStackState extends State<NavigationStack> {
@@ -26,6 +27,7 @@ class NavigationStackState extends State<NavigationStack> {
   Widget pageName;
 
   NavigationStackState(this.pageName);
+
 
   @override
   Widget build(BuildContext context) {
@@ -46,11 +48,30 @@ class NavigationStackState extends State<NavigationStack> {
 
 
 class HomePage extends StatefulWidget {
+
+  final String currentUserId;
+
+  HomePage({Key key, @required this.currentUserId}) : super(key: key);
+
   @override
-  _HomePageState createState() => _HomePageState();
+  _HomePageState createState() => _HomePageState(currentUserId: this.currentUserId);
 }
 
-class _HomePageState extends State<HomePage> with TickerProviderStateMixin<HomePage> {
+class _HomePageState extends State<HomePage> {
+
+  final String currentUserId;
+  _HomePageState({Key key, @required this.currentUserId});
+
+  @override
+  initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   int _currentIndex = 0;
 
   @override
@@ -60,9 +81,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin<HomeP
           child: IndexedStack(
             index: _currentIndex,
             children: <Widget>[
-              NavigationStack(child: LoginPage()),
-              NavigationStack(child: Courses()),
-              NavigationStack(child: Notes()),
+              NavigationStack(child: Profile(currentUserId: this.currentUserId)),
+              NavigationStack(child: Courses(currentUserId: this.currentUserId)),
+              NavigationStack(child: Notes(currentUserId: this.currentUserId)),
             ],
           ),
         ),

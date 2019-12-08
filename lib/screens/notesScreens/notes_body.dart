@@ -43,12 +43,14 @@ class NotesBodyState extends State<NotesBody> {
           actions: <Widget>[
             IconButton(
               icon: Icon(Icons.save),
+          tooltip: 'Save Note',
               onPressed: () {
                 debugPrint("User Pressed Save Button");
               },
             ),
             IconButton(
               icon: Icon(Icons.delete),
+                tooltip: 'Delete Note',
               onPressed: () {
                 debugPrint("User Pressed Delete Button");
               },
@@ -99,7 +101,7 @@ class NotesBodyState extends State<NotesBody> {
               ),
               Expanded(
                 child: Text(
-                  "Lecture",
+                  "Lecture # ",
                   textAlign: TextAlign.center,
                   textDirection: TextDirection.ltr,
                   style: TextStyle(

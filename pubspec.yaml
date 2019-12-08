@@ -21,6 +21,10 @@ dependencies:
   firebase_auth:
   google_sign_in: ^4.0.14
   http:
+  firebase_database:
+  shared_preferences:
+  fluttertoast:
+  cached_network_image:
   flutter_auth_buttons:
   flutter:
     sdk: flutter

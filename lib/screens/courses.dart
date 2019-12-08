@@ -3,16 +3,24 @@ import 'package:flutter/rendering.dart';
 import 'package:inter_note/screens/coursesScreens/add_course.dart';
 
 class Courses extends StatefulWidget {
-  const Courses({Key key}) : super(key: key);
+
+  final String currentUserId;
+
+  Courses({Key key, @required this.currentUserId}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
-    return CoursesState();
+    return CoursesState(currentUserId: this.currentUserId);
   }
 }
 
 class CoursesState extends State<Courses> {
+
+  final String currentUserId;
+
+  CoursesState({Key key, @required this.currentUserId});
+
   final _minimumPadding = 5.0;
 
   int _coursesCount = 10;

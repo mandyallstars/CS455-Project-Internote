@@ -29,7 +29,8 @@ class AppState extends State<App> {
           theme: ThemeData(primaryColor: Colors.blueAccent),
           home: LoginPage(),
           routes: <String, WidgetBuilder> {
-            '/homePage': (BuildContext context) => HomePage()
+            '/homePage': (BuildContext context) => HomePage(),
+            '/landingPage': (BuildContext context) => LoginPage()
           }
         ));
   }

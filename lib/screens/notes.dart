@@ -5,7 +5,9 @@ import 'package:inter_note/screens/notesScreens/notes_body.dart';
 
 class Notes extends StatefulWidget {
 
-  const Notes({Key key}) : super(key: key);
+  final String currentUserId;
+
+  Notes({Key key, @required this.currentUserId}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -14,6 +16,11 @@ class Notes extends StatefulWidget {
 }
 
 class NotesState extends State<Notes> {
+
+  final String currentUserId;
+
+  NotesState({Key key, @required this.currentUserId});
+
   final _minimumPadding = 5.0;
 
   int _count = 10;

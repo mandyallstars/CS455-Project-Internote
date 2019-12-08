@@ -315,7 +315,9 @@ class AddCourseState extends State<AddCourse> {
                       ),
                     ],
                   ),
-                  Divider(color: Colors.white),
+                  Container(
+                    padding: EdgeInsets.only(top: _minimumPadding, bottom: _minimumPadding),
+                  ),
                   Container(
                     margin: EdgeInsets.only(left: _minimumPadding*20, right: _minimumPadding*20),
                     child: RaisedButton(
