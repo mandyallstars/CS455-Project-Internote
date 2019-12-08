@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:async' as prefix1;
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart' as prefix0;
 import 'package:flutter/rendering.dart';
@@ -215,7 +217,7 @@ class ProfileState extends State<Profile> {
                   initialData: "Add School",
                   builder: (BuildContext context, AsyncSnapshot<String> text) {
                     return Text(
-                      text.data??"Add School",
+                      text.data ?? "Add School",
                       style: TextStyle(color: Colors.blueGrey, fontSize: 18),
                       textDirection: TextDirection.rtl,
                       softWrap: false,
@@ -240,23 +242,47 @@ class ProfileState extends State<Profile> {
   }
 
   Future<String> getSchoolName() async {
-    final QuerySnapshot userSchoolResult = await Firestore.instance
-        .collection('user_school_info')
-        .where('user_id', isEqualTo: this.currentUserId)
-        .where('currently_selected', isEqualTo: true)
-        .getDocuments();
+//    final QuerySnapshot userSchoolResult = await Firestore.instance
+//        .collection('user_school_info')
+//        .where('user_id', isEqualTo: this.currentUserId)
+//        .where('currently_selected', isEqualTo: true)
+//        .getDocuments();
 
-    final List<DocumentSnapshot> userSchoolDocument =
-        userSchoolResult.documents;
-    if (userSchoolDocument.length == 0) {
+    final userSchoolResult = await Firestore.instance.collection('users').document(this.currentUserId).get();
+
+//    final List<DocumentSnapshot> userSchoolDocument =
+//        userSchoolResult.documents;
+    if (userSchoolResult['current_school_id'] == '00') {
       return "Add School";
     } else {
-      String currentSchoolName = userSchoolDocument[0]['school_name'];
-      return currentSchoolName;
+//      final currentSchoolName = userSchoolResult['school_name'];
+//      return currentSchoolName;
+      final currentSchoolName = await Firestore.instance.collection('schools').document(userSchoolResult['current_school_id']).get();
+      return currentSchoolName['school_name'];
     }
   }
 
+//  Future<String> getCurrentSchoolID() async {
+//    final QuerySnapshot userSchoolResult = await Firestore.instance
+//        .collection('user_school_info')
+//        .where('user_id', isEqualTo: this.currentUserId)
+//        .where('currently_selected', isEqualTo: true)
+//        .getDocuments();
+//
+//    final List<DocumentSnapshot> userSchoolDocument =
+//        userSchoolResult.documents;
+//    if (userSchoolDocument.length == 0) {
+//      return "0";
+//    } else {
+//      String currentSchoolID = userSchoolDocument[0]['school_id'];
+//      return currentSchoolID;
+//    }
+//}
+
   ListView getThisSchoolCourses() {
+
+
+
     return ListView.builder(
       scrollDirection: Axis.vertical,
       shrinkWrap: true,
@@ -281,8 +307,8 @@ class ProfileState extends State<Profile> {
 
     Image image = Image(
       image: assetImage,
-      width: 260.0,
-      height: 260.0,
+      width: 125,
+      height: 125,
     );
 
     return Container(

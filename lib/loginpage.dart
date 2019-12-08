@@ -100,6 +100,7 @@ class _LoginPageState extends State<LoginPage> {
           'photoUrl': firebaseUser.photoUrl,
           'id': firebaseUser.uid,
           'username': firebaseUser.email,
+          'current_school_id': "00",
           'createdAt': DateTime.now(),
         });
 
@@ -108,6 +109,7 @@ class _LoginPageState extends State<LoginPage> {
         await prefs.setString('id', currentUser.uid);
         await prefs.setString('displayname', currentUser.displayName);
         await prefs.setString('photoUrl', currentUser.photoUrl);
+        await prefs.setString('current_school_id', "00");
       } else {
 
        // stream: Firestore.instance.collection('users').document(this.currentUserId).snapshots();
@@ -120,8 +122,8 @@ class _LoginPageState extends State<LoginPage> {
         // Write data to local
         await prefs.setString('id', documents[0]['id']);
         await prefs.setString('displayname', documents[0]['displayname']);
-        //await prefs.setString('photoUrl', documents[0]['photoUrl']);
         await prefs.setString('photoUrl', currentUser.photoUrl);
+        await prefs.setString('current_school_id', "00");
       }
       Fluttertoast.showToast(msg: "Sign In Success");
       this.setState(() {
@@ -138,108 +140,6 @@ class _LoginPageState extends State<LoginPage> {
       });
     }
   }
-
-//  GoogleSignInAccount _currentUser;
-//  String _contactText;
-//
-//  @override
-//  void initState() {
-//    super.initState();
-//    _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
-//      setState(() {
-//        _currentUser = account;
-//      });
-//      if (_currentUser != null) {
-//        _handleGetContact();
-//      }
-//    });
-//    _googleSignIn.signInSilently();
-//  }
-
-//  Future<void> _handleGetContact() async {
-//    setState(() {
-//      _contactText = "Loading contact info...";
-//    });
-//    final http.Response response = await http.get(
-//      'https://people.googleapis.com/v1/people/me/connections'
-//      '?requestMask.includeField=person.names',
-//      headers: await _currentUser.authHeaders,
-//    );
-//    if (response.statusCode != 200) {
-//      setState(() {
-//        _contactText = "People API gave a ${response.statusCode} "
-//            "response. Check logs for details.";
-//      });
-//      print('People API ${response.statusCode} response: ${response.body}');
-//      return;
-//    }
-//    final Map<String, dynamic> data = json.decode(response.body);
-//    final String namedContact = _pickFirstNamedContact(data);
-//    setState(() {
-//      if (namedContact != null) {
-//        _contactText = "I see you know $namedContact!";
-//      } else {
-//        _contactText = "No contacts to display.";
-//      }
-//    });
-//  }
-
-//  String _pickFirstNamedContact(Map<String, dynamic> data) {
-//    final List<dynamic> connections = data['connections'];
-//    final Map<String, dynamic> contact = connections?.firstWhere(
-//      (dynamic contact) => contact['names'] != null,
-//      orElse: () => null,
-//    );
-//    if (contact != null) {
-//      final Map<String, dynamic> name = contact['names'].firstWhere(
-//        (dynamic name) => name['displayName'] != null,
-//        orElse: () => null,
-//      );
-//      if (name != null) {
-//        return name['displayName'];
-//      }
-//    }
-//    return null;
-//  }
-
-//  Future<void> _handleSignIn() async {
-//    try {
-//      GoogleSignInAccount googleUser = await _googleSignIn.signIn();
-//      GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-//      final AuthCredential credential = GoogleAuthProvider.getCredential(
-//          idToken: googleAuth.idToken, accessToken: googleAuth.accessToken);
-//      FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-//      FirebaseUser firebaseUser =
-//          (await firebaseAuth.signInWithCredential(credential)).user;
-//
-//      if (firebaseUser != null) {
-//        //check is already signed up
-//        final QuerySnapshot result = await Firestore.instance
-//            .collection('users')
-//            .where('id', isEqualTo: firebaseUser.uid)
-//            .getDocuments();
-//        final List<DocumentSnapshot> documents = result.documents;
-//        if (documents.length == 0) {
-//          // Update data to server if new user
-//          Firestore.instance
-//              .collection('users')
-//              .document(firebaseUser.uid)
-//              .setData({
-//            'username': firebaseUser.email,
-//            'displayname': firebaseUser.displayName,
-//            'photoUrl': firebaseUser.photoUrl,
-//            'id': firebaseUser.uid,
-//          });
-//        }
-//      }
-//    } catch (error) {
-//      print(error);
-//    }
-//  }
-
-//  Future<void> _handleSignOut() async {
-//    _googleSignIn.disconnect();
-//  }
 
   Widget _buildBody() {
     return Column(

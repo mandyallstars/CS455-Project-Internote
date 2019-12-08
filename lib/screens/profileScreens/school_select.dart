@@ -233,6 +233,12 @@ class _SchoolListState extends State<SchoolList> {
           {
             'currently_selected': true,
           });
+      final currentSchoolDoc = await Firestore.instance.collection('user_school_info').document(document.documentID).get();
+      Firestore.instance.collection('users').document(this.loggedInUserId).updateData({
+        'current_school_id': currentSchoolDoc['school_id'],
+      });
+
+
     }
 
   }
