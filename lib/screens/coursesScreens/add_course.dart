@@ -1,27 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AddCourse extends StatefulWidget {
   String appBarTitle;
+  String loggedInUserId;
+  String courseId;
 
-  AddCourse(this.appBarTitle);
+  AddCourse(this.appBarTitle, this.loggedInUserId, this.courseId);
 
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
-    return AddCourseState(appBarTitle);
+    return AddCourseState(appBarTitle, this.loggedInUserId, this.courseId);
   }
 }
 
 class AddCourseState extends State<AddCourse> {
   String appBarTitle;
+  String loggedInUserId;
+  String courseId;
 
-  AddCourseState(this.appBarTitle);
+  AddCourseState(this.appBarTitle, this.loggedInUserId, this.courseId);
 
   final _minimumPadding = 5.0;
 
   final TextEditingController _searchBarController = TextEditingController();
-  final TextEditingController _semesterController = TextEditingController();
   final TextEditingController _semesterYearController = TextEditingController();
   final TextEditingController _courseNameController = TextEditingController();
   final TextEditingController _courseNumberController = TextEditingController();
@@ -35,14 +39,45 @@ class AddCourseState extends State<AddCourse> {
   final TextEditingController _timeToHourController = TextEditingController();
   final TextEditingController _timeToMinuteController = TextEditingController();
 
+  Future<void> setCourseInfo() async {
+    if (this.courseId != 'New') {
+      final courseDoc = await Firestore.instance
+          .collection('courses')
+          .document(this.courseId)
+          .get();
+
+      _semesterYearController.text = courseDoc['semester_year'];
+      _courseNameController.text = courseDoc['course_name'];
+      _courseNumberController.text = courseDoc['course_number'];
+      _courseSectionController.text = courseDoc['course_section'];
+      _instructorNameController.text = courseDoc['instructor_name'];
+      _timeFromHourController.text =
+          courseDoc['time_from'].toString().split(':')[0];
+      _timeFromMinuteController.text =
+          courseDoc['time_from'].toString().split(':')[1].split(' ')[0];
+      _timeToHourController.text =
+          courseDoc['time_to'].toString().split(':')[0];
+      _timeToMinuteController.text =
+          courseDoc['time_to'].toString().split(':')[1].split(' ')[0];
+      amPmValueFrom =
+          courseDoc['time_from'].toString().split(':')[1].split(' ')[1];
+      amPmValueTo = courseDoc['time_to'].toString().split(':')[1].split(' ')[1];
+      semesterValue = courseDoc['semester'];
+    }
+  }
+
   final _formKey = GlobalKey<FormState>();
 
   var _semesterValue = ["Spring Summer", "Fall", "Winter"];
+  var semesterValue;
+  var amPmValueFrom;
+  var amPmValueTo;
 
   var _amPmValue = ["AM", "PM"];
 
   @override
   Widget build(BuildContext context) {
+    setCourseInfo();
     // TODO: implement build
     return WillPopScope(
       onWillPop: () {
@@ -68,13 +103,6 @@ class AddCourseState extends State<AddCourse> {
           ],
         ),
         body: getCourseAddForm(),
-//      floatingActionButton: FloatingActionButton.extended(
-//        icon: Icon(Icons.add),
-//        label: Text('Add Course'),
-//        onPressed: () {
-//          debugPrint("Add Course Button Pressed");
-//        },
-//      ),
       ),
     );
   }
@@ -128,6 +156,7 @@ class AddCourseState extends State<AddCourse> {
                         children: <Widget>[
                           Expanded(
                             child: DropdownButton(
+                              value: semesterValue,
                               isExpanded: true,
                               elevation: 10,
                               iconEnabledColor: Colors.black,
@@ -145,8 +174,7 @@ class AddCourseState extends State<AddCourse> {
                                   style: TextStyle(fontSize: 20)),
                               onChanged: (semesterDropDownItem) {
                                 setState(() {
-                                  debugPrint(
-                                      "User selected $semesterDropDownItem");
+                                  semesterValue = semesterDropDownItem;
                                 });
                               },
                             ),
@@ -169,6 +197,11 @@ class AddCourseState extends State<AddCourse> {
                                 labelText: "Year E.g. 2019",
                                 counter: Offstage(),
                               ),
+                              validator: (value) {
+                                if (value.isEmpty) {
+                                  return 'Please enter a year';
+                                }
+                              },
                             ),
                           ),
                         ],
@@ -177,24 +210,44 @@ class AddCourseState extends State<AddCourse> {
                     controller: _courseNameController,
                     decoration: InputDecoration(labelText: "Course Name"),
                     style: TextStyle(fontSize: 20),
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'Please enter Course Name';
+                      }
+                    },
                   ),
                   TextFormField(
                     controller: _courseNumberController,
                     decoration:
                         InputDecoration(labelText: "Course Number E.g. CS 100"),
                     style: TextStyle(fontSize: 20),
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'Please enter Course Number';
+                      }
+                    },
                   ),
                   TextFormField(
                     controller: _courseSectionController,
                     decoration: InputDecoration(
                         labelText: "Course Section E.g. 001 or A"),
                     style: TextStyle(fontSize: 20),
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return 'Please enter Course Section. Enter 001 if no section.';
+                      }
+                    },
                   ),
                   TextFormField(
                     controller: _instructorNameController,
                     decoration: InputDecoration(
                         labelText: "Instructor's Name E.g. John Smith"),
                     style: TextStyle(fontSize: 20),
+                    validator: (value) {
+                      if (value.isEmpty) {
+                        return "Please enter Intructor's Name";
+                      }
+                    },
                   ),
                   Row(
                     children: <Widget>[
@@ -209,6 +262,11 @@ class AddCourseState extends State<AddCourse> {
                           controller: _timeFromHourController,
                           decoration: InputDecoration(
                               hintText: "01", counter: Offstage()),
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return '*Req';
+                            }
+                          },
                         ),
                       ),
                       Text(" : ",
@@ -226,10 +284,16 @@ class AddCourseState extends State<AddCourse> {
                           controller: _timeFromMinuteController,
                           decoration: InputDecoration(
                               hintText: "15", counter: Offstage()),
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return '*Req';
+                            }
+                          },
                         ),
                       ),
                       Expanded(
                         child: DropdownButton(
+                          value: amPmValueFrom,
                           isExpanded: true,
                           elevation: 10,
                           items: _amPmValue.map((String amPmItem) {
@@ -247,9 +311,9 @@ class AddCourseState extends State<AddCourse> {
                             textAlign: TextAlign.center,
                             style: TextStyle(fontSize: 15),
                           ),
-                          onChanged: (semesterDropDownItem) {
+                          onChanged: (amPmItem) {
                             setState(() {
-                              debugPrint("User selected $semesterDropDownItem");
+                              amPmValueFrom = amPmItem;
                             });
                           },
                         ),
@@ -268,6 +332,11 @@ class AddCourseState extends State<AddCourse> {
                           controller: _timeToHourController,
                           decoration: InputDecoration(
                               hintText: "01", counter: Offstage()),
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return '*Req';
+                            }
+                          },
                         ),
                       ),
                       Text(" : ",
@@ -285,10 +354,16 @@ class AddCourseState extends State<AddCourse> {
                           controller: _timeToMinuteController,
                           decoration: InputDecoration(
                               hintText: "15", counter: Offstage()),
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return '*Req';
+                            }
+                          },
                         ),
                       ),
                       Expanded(
                         child: DropdownButton(
+                          value: amPmValueTo,
                           isExpanded: true,
                           elevation: 10,
                           items: _amPmValue.map((String amPmItem) {
@@ -303,12 +378,12 @@ class AddCourseState extends State<AddCourse> {
                           }).toList(),
                           hint: Text(
                             "PM",
-                            style: TextStyle(fontSize: 15),
                             textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 15),
                           ),
-                          onChanged: (semesterDropDownItem) {
+                          onChanged: (amPmItem) {
                             setState(() {
-                              debugPrint("User selected $semesterDropDownItem");
+                              amPmValueTo = amPmItem;
                             });
                           },
                         ),
@@ -316,10 +391,13 @@ class AddCourseState extends State<AddCourse> {
                     ],
                   ),
                   Container(
-                    padding: EdgeInsets.only(top: _minimumPadding, bottom: _minimumPadding),
+                    padding: EdgeInsets.only(
+                        top: _minimumPadding, bottom: _minimumPadding),
                   ),
                   Container(
-                    margin: EdgeInsets.only(left: _minimumPadding*20, right: _minimumPadding*20),
+                    margin: EdgeInsets.only(
+                        left: _minimumPadding * 20,
+                        right: _minimumPadding * 20),
                     child: RaisedButton(
                       //padding: EdgeInsets.only(left: 40, right: 40),
                       shape: RoundedRectangleBorder(
@@ -333,7 +411,24 @@ class AddCourseState extends State<AddCourse> {
                       textColor: Colors.white,
                       splashColor: Colors.green,
                       onPressed: () {
-                        debugPrint("ADD COURSE button Pressed");
+                        if (amPmValueFrom == null ||
+                            amPmValueTo == null ||
+                            semesterValue == null) {
+                          Scaffold.of(context).showSnackBar(SnackBar(
+                              content: Text(
+                            'Select drop down values',
+                            textAlign: TextAlign.center,
+                          )));
+                        } else if (_formKey.currentState.validate()) {
+                          addCourseToUser();
+                          Navigator.of(context).pop();
+                        } else {
+                          Scaffold.of(context).showSnackBar(SnackBar(
+                              content: Text(
+                            'Enter Valid Values',
+                            textAlign: TextAlign.center,
+                          )));
+                        }
                       },
                     ),
                   )
@@ -344,6 +439,113 @@ class AddCourseState extends State<AddCourse> {
         ],
       ),
     );
+  }
+
+  Future<void> addCourseToUser() async {
+    final currentUserDoc = await Firestore.instance
+        .collection('users')
+        .document(this.loggedInUserId)
+        .get();
+
+    var currentSchoolId = currentUserDoc['current_school_id'];
+
+    if (this.courseId == 'New') {
+      final QuerySnapshot doesCourseExist = await Firestore.instance
+          .collection('courses')
+          .where('school_id', isEqualTo: currentSchoolId)
+          .where('course_name', isEqualTo: _courseNameController.text)
+          .where('course_number', isEqualTo: _courseNumberController.text)
+          .where('course_section', isEqualTo: _courseSectionController.text)
+          .where('semester', isEqualTo: semesterValue)
+          .where('semester_year', isEqualTo: _semesterYearController.text)
+          .where('instructor_name', isEqualTo: _instructorNameController.text)
+          .where('time_from',
+              isEqualTo: _timeFromHourController.text +
+                  ":" +
+                  _timeFromMinuteController.text +
+                  " $amPmValueFrom")
+          .where('time_to',
+              isEqualTo: _timeToHourController.text +
+                  ":" +
+                  _timeToMinuteController.text +
+                  " $amPmValueTo")
+          .getDocuments();
+
+      final List<DocumentSnapshot> doesCourseExistDoc =
+          doesCourseExist.documents;
+      if (doesCourseExistDoc.length == 0) {
+        DocumentReference docRef =
+            await Firestore.instance.collection('courses').add({
+          'school_id': currentSchoolId,
+          'course_name': _courseNameController.text,
+          'course_number': _courseNumberController.text,
+          'course_section': _courseSectionController.text,
+          'semester': semesterValue,
+          'semester_year': _semesterYearController.text,
+          'instructor_name': _instructorNameController.text,
+          'time_from': _timeFromHourController.text +
+              ":" +
+              _timeFromMinuteController.text +
+              " $amPmValueFrom",
+          'time_to': _timeToHourController.text +
+              ":" +
+              _timeToMinuteController.text +
+              " $amPmValueTo"
+        });
+
+        Firestore.instance.collection('user_course_info').add({
+          'user_id': this.loggedInUserId,
+          'school_id': currentSchoolId,
+          'course_id': docRef.documentID,
+          'course_name': _courseNameController.text,
+          'course_number': _courseNumberController.text
+        });
+      } else {
+        var courseId = doesCourseExistDoc[0].documentID;
+
+        Firestore.instance.collection('user_course_info').add({
+          'user_id': this.loggedInUserId,
+          'school_id': currentSchoolId,
+          'course_id': courseId,
+          'course_name': doesCourseExistDoc[0]['course_name'],
+          'course_number': doesCourseExistDoc[0]['course_number']
+        });
+      }
+    } else {
+      Firestore.instance
+          .collection('courses')
+          .document(this.courseId)
+          .updateData({
+        'course_name': _courseNameController.text,
+        'course_number': _courseNumberController.text,
+        'course_section': _courseSectionController.text,
+        'semester': semesterValue,
+        'semester_year': _semesterYearController.text,
+        'instructor_name': _instructorNameController.text,
+        'time_from': _timeFromHourController.text +
+            ":" +
+            _timeFromMinuteController.text +
+            " $amPmValueFrom",
+        'time_to': _timeToHourController.text +
+            ":" +
+            _timeToMinuteController.text +
+            " $amPmValueTo"
+      });
+
+      final QuerySnapshot userCourse = await Firestore.instance
+          .collection('user_course_info')
+          .where('user_id', isEqualTo: this.loggedInUserId)
+          .where('course_id', isEqualTo: this.courseId)
+          .getDocuments();
+
+      final List<DocumentSnapshot> userCourseDoc =
+          userCourse.documents;
+
+      Firestore.instance.collection('user_course_info').document(userCourseDoc[0].documentID).updateData({
+        'course_name': _courseNameController.text,
+        'course_number': _courseNumberController.text
+      });
+    }
   }
 
   void navigateToPreviousScreen() {

@@ -178,7 +178,7 @@ class ProfileState extends State<Profile> {
                           color: Colors.black,
                           fontWeight: FontWeight.bold),
                     )),
-                getThisSchoolCourses()
+                getThisSchoolCourses(document['current_school_id'])
               ],
             );
           }
@@ -248,7 +248,10 @@ class ProfileState extends State<Profile> {
 //        .where('currently_selected', isEqualTo: true)
 //        .getDocuments();
 
-    final userSchoolResult = await Firestore.instance.collection('users').document(this.currentUserId).get();
+    final userSchoolResult = await Firestore.instance
+        .collection('users')
+        .document(this.currentUserId)
+        .get();
 
 //    final List<DocumentSnapshot> userSchoolDocument =
 //        userSchoolResult.documents;
@@ -257,48 +260,74 @@ class ProfileState extends State<Profile> {
     } else {
 //      final currentSchoolName = userSchoolResult['school_name'];
 //      return currentSchoolName;
-      final currentSchoolName = await Firestore.instance.collection('schools').document(userSchoolResult['current_school_id']).get();
+      final currentSchoolName = await Firestore.instance
+          .collection('schools')
+          .document(userSchoolResult['current_school_id'])
+          .get();
       return currentSchoolName['school_name'];
     }
   }
 
-//  Future<String> getCurrentSchoolID() async {
-//    final QuerySnapshot userSchoolResult = await Firestore.instance
-//        .collection('user_school_info')
-//        .where('user_id', isEqualTo: this.currentUserId)
-//        .where('currently_selected', isEqualTo: true)
-//        .getDocuments();
-//
-//    final List<DocumentSnapshot> userSchoolDocument =
-//        userSchoolResult.documents;
-//    if (userSchoolDocument.length == 0) {
-//      return "0";
-//    } else {
-//      String currentSchoolID = userSchoolDocument[0]['school_id'];
-//      return currentSchoolID;
-//    }
-//}
 
-  ListView getThisSchoolCourses() {
+  Container getThisSchoolCourses(String currentSchoolID) {
+    return Container(
+      child: StreamBuilder(
+          stream: Firestore.instance
+              .collection('user_course_info')
+              .where('user_id', isEqualTo: this.currentUserId)
+              .where('school_id', isEqualTo: currentSchoolID)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return ListView(
+                scrollDirection: Axis.vertical,
+                shrinkWrap: true,
+                physics: ScrollPhysics(),
+                children: <Widget>[
+                  ListTile(
+                    title: Text(
+                      "Add courses to this school in Courses tab",
+                      style: TextStyle(color: Colors.blueGrey, fontSize: 15.0),
+                      textDirection: TextDirection.ltr,
+                      softWrap: true,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  )
+                ],
+              );
+            } else {
+              return ListView.separated(
+                  scrollDirection: Axis.vertical,
+                  shrinkWrap: true,
+                  physics: ScrollPhysics(),
+                  itemCount: snapshot.data.documents.length,
+                  separatorBuilder: (context, index) => Divider(
+                    color: Colors.black,
+                    thickness: 0.2,
+                  ),
+                  itemBuilder: (context, index) =>
+                      buildCourseItem(context, snapshot.data.documents[index]));
+            }
+          }),
+    );
+  }
 
-
-
-    return ListView.builder(
-      scrollDirection: Axis.vertical,
-      shrinkWrap: true,
-      physics: ScrollPhysics(),
-      itemCount: _thisSchoolCoursesCount,
-      itemBuilder: (BuildContext context, int position) {
-        return ListTile(
-          title: Text(
-            "Course Title Placeholder",
-            style: TextStyle(color: Colors.black, fontSize: 20.0),
-            textDirection: TextDirection.ltr,
-            softWrap: false,
-            overflow: TextOverflow.ellipsis,
-          ),
-        );
-      },
+  Widget buildCourseItem(BuildContext context, DocumentSnapshot document) {
+    return ListTile(
+      title: Text(
+        document['course_number'],
+        style: TextStyle(color: Colors.black, fontSize: 20.0),
+        textDirection: TextDirection.ltr,
+        softWrap: false,
+        overflow: TextOverflow.ellipsis,
+      ),
+      subtitle: Text(
+        document['course_name'],
+        style: TextStyle(color: Colors.black, fontSize: 15.0),
+        textDirection: TextDirection.ltr,
+        softWrap: false,
+        overflow: TextOverflow.ellipsis,
+      ),
     );
   }
 
