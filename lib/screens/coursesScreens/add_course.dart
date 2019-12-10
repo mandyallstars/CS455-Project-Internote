@@ -39,6 +39,11 @@ class AddCourseState extends State<AddCourse> {
   final TextEditingController _timeToHourController = TextEditingController();
   final TextEditingController _timeToMinuteController = TextEditingController();
 
+  var _semesterValue = ["Spring Summer", "Fall", "Winter"];
+  var semesterValue;
+  var amPmValueFrom;
+  var amPmValueTo;
+
   Future<void> setCourseInfo() async {
     if (this.courseId != 'New') {
       final courseDoc = await Firestore.instance
@@ -66,18 +71,20 @@ class AddCourseState extends State<AddCourse> {
     }
   }
 
-  final _formKey = GlobalKey<FormState>();
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    setCourseInfo();
+  }
 
-  var _semesterValue = ["Spring Summer", "Fall", "Winter"];
-  var semesterValue;
-  var amPmValueFrom;
-  var amPmValueTo;
+  final _formKey = GlobalKey<FormState>();
 
   var _amPmValue = ["AM", "PM"];
 
   @override
   Widget build(BuildContext context) {
-    setCourseInfo();
+    //setCourseInfo();
     // TODO: implement build
     return WillPopScope(
       onWillPop: () {
@@ -199,7 +206,7 @@ class AddCourseState extends State<AddCourse> {
                               ),
                               validator: (value) {
                                 if (value.isEmpty) {
-                                  return 'Please enter a year';
+                                  return '*Required';
                                 }
                               },
                             ),
@@ -212,7 +219,7 @@ class AddCourseState extends State<AddCourse> {
                     style: TextStyle(fontSize: 20),
                     validator: (value) {
                       if (value.isEmpty) {
-                        return 'Please enter Course Name';
+                        return 'Required';
                       }
                     },
                   ),
@@ -223,7 +230,7 @@ class AddCourseState extends State<AddCourse> {
                     style: TextStyle(fontSize: 20),
                     validator: (value) {
                       if (value.isEmpty) {
-                        return 'Please enter Course Number';
+                        return 'Required';
                       }
                     },
                   ),
@@ -234,7 +241,7 @@ class AddCourseState extends State<AddCourse> {
                     style: TextStyle(fontSize: 20),
                     validator: (value) {
                       if (value.isEmpty) {
-                        return 'Please enter Course Section. Enter 001 if no section.';
+                        return 'Required. Enter 001 if no section.';
                       }
                     },
                   ),
@@ -245,7 +252,7 @@ class AddCourseState extends State<AddCourse> {
                     style: TextStyle(fontSize: 20),
                     validator: (value) {
                       if (value.isEmpty) {
-                        return "Please enter Intructor's Name";
+                        return "Required";
                       }
                     },
                   ),
@@ -449,73 +456,32 @@ class AddCourseState extends State<AddCourse> {
 
     var currentSchoolId = currentUserDoc['current_school_id'];
 
-    if (this.courseId == 'New') {
-      final QuerySnapshot doesCourseExist = await Firestore.instance
-          .collection('courses')
-          .where('school_id', isEqualTo: currentSchoolId)
-          .where('course_name', isEqualTo: _courseNameController.text)
-          .where('course_number', isEqualTo: _courseNumberController.text)
-          .where('course_section', isEqualTo: _courseSectionController.text)
-          .where('semester', isEqualTo: semesterValue)
-          .where('semester_year', isEqualTo: _semesterYearController.text)
-          .where('instructor_name', isEqualTo: _instructorNameController.text)
-          .where('time_from',
-              isEqualTo: _timeFromHourController.text +
-                  ":" +
-                  _timeFromMinuteController.text +
-                  " $amPmValueFrom")
-          .where('time_to',
-              isEqualTo: _timeToHourController.text +
-                  ":" +
-                  _timeToMinuteController.text +
-                  " $amPmValueTo")
-          .getDocuments();
+    final QuerySnapshot doesCourseExist = await Firestore.instance
+        .collection('courses')
+        .where('school_id', isEqualTo: currentSchoolId)
+        .where('course_name', isEqualTo: _courseNameController.text)
+        .where('course_number', isEqualTo: _courseNumberController.text)
+        .where('course_section', isEqualTo: _courseSectionController.text)
+        .where('semester', isEqualTo: semesterValue)
+        .where('semester_year', isEqualTo: _semesterYearController.text)
+        .where('instructor_name', isEqualTo: _instructorNameController.text)
+        .where('time_from',
+            isEqualTo: _timeFromHourController.text +
+                ":" +
+                _timeFromMinuteController.text +
+                " $amPmValueFrom")
+        .where('time_to',
+            isEqualTo: _timeToHourController.text +
+                ":" +
+                _timeToMinuteController.text +
+                " $amPmValueTo")
+        .getDocuments();
 
-      final List<DocumentSnapshot> doesCourseExistDoc =
-          doesCourseExist.documents;
-      if (doesCourseExistDoc.length == 0) {
-        DocumentReference docRef =
-            await Firestore.instance.collection('courses').add({
-          'school_id': currentSchoolId,
-          'course_name': _courseNameController.text,
-          'course_number': _courseNumberController.text,
-          'course_section': _courseSectionController.text,
-          'semester': semesterValue,
-          'semester_year': _semesterYearController.text,
-          'instructor_name': _instructorNameController.text,
-          'time_from': _timeFromHourController.text +
-              ":" +
-              _timeFromMinuteController.text +
-              " $amPmValueFrom",
-          'time_to': _timeToHourController.text +
-              ":" +
-              _timeToMinuteController.text +
-              " $amPmValueTo"
-        });
-
-        Firestore.instance.collection('user_course_info').add({
-          'user_id': this.loggedInUserId,
-          'school_id': currentSchoolId,
-          'course_id': docRef.documentID,
-          'course_name': _courseNameController.text,
-          'course_number': _courseNumberController.text
-        });
-      } else {
-        var courseId = doesCourseExistDoc[0].documentID;
-
-        Firestore.instance.collection('user_course_info').add({
-          'user_id': this.loggedInUserId,
-          'school_id': currentSchoolId,
-          'course_id': courseId,
-          'course_name': doesCourseExistDoc[0]['course_name'],
-          'course_number': doesCourseExistDoc[0]['course_number']
-        });
-      }
-    } else {
-      Firestore.instance
-          .collection('courses')
-          .document(this.courseId)
-          .updateData({
+    final List<DocumentSnapshot> doesCourseExistDoc = doesCourseExist.documents;
+    if (doesCourseExistDoc.length == 0) {
+      DocumentReference docRef =
+          await Firestore.instance.collection('courses').add({
+        'school_id': currentSchoolId,
         'course_name': _courseNameController.text,
         'course_number': _courseNumberController.text,
         'course_section': _courseSectionController.text,
@@ -532,19 +498,52 @@ class AddCourseState extends State<AddCourse> {
             " $amPmValueTo"
       });
 
-      final QuerySnapshot userCourse = await Firestore.instance
-          .collection('user_course_info')
-          .where('user_id', isEqualTo: this.loggedInUserId)
-          .where('course_id', isEqualTo: this.courseId)
-          .getDocuments();
-
-      final List<DocumentSnapshot> userCourseDoc =
-          userCourse.documents;
-
-      Firestore.instance.collection('user_course_info').document(userCourseDoc[0].documentID).updateData({
+      Firestore.instance.collection('user_course_info').add({
+        'user_id': this.loggedInUserId,
+        'school_id': currentSchoolId,
+        'course_id': docRef.documentID,
         'course_name': _courseNameController.text,
         'course_number': _courseNumberController.text
       });
+    } else {
+      var courseId = doesCourseExistDoc[0].documentID;
+
+      final QuerySnapshot doesCourseExistForUser = await Firestore.instance
+          .collection('user_course_info')
+          .where('user_id', isEqualTo: this.loggedInUserId)
+          .where('course_number', isEqualTo: _courseNumberController.text)
+          .where('course_name', isEqualTo: _courseNameController.text)
+          .getDocuments();
+
+      final List<DocumentSnapshot> doesCourseExistForUserDoc =
+          doesCourseExistForUser.documents;
+
+      if (doesCourseExistForUserDoc.length == 0) {
+        Firestore.instance.collection('user_course_info').add({
+          'user_id': this.loggedInUserId,
+          'school_id': currentSchoolId,
+          'course_id': courseId,
+          'course_name': doesCourseExistDoc[0]['course_name'],
+          'course_number': doesCourseExistDoc[0]['course_number']
+        });
+
+        if (this.courseId != 'New') {
+          final QuerySnapshot getThisCourseForUser = await Firestore.instance
+              .collection('user_course_info')
+              .where('user_id', isEqualTo: this.loggedInUserId)
+              .where('school_id', isEqualTo: currentSchoolId)
+              .where('course_id', isEqualTo: this.courseId)
+              .getDocuments();
+
+          final List<DocumentSnapshot> getThisCourseForUserDoc =
+              getThisCourseForUser.documents;
+
+          Firestore.instance
+              .collection('user_course_info')
+              .document(getThisCourseForUserDoc[0].documentID)
+              .delete();
+        }
+      }
     }
   }
 
