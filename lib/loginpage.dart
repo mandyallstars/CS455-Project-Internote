@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -9,13 +8,8 @@ import 'package:inter_note/home_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-//GoogleSignIn _googleSignIn = GoogleSignIn(
-//  scopes: <String>[
-//    'email',
-//    'https://www.googleapis.com/auth/contacts.readonly',
-//  ],
-//);
 
+//Stateful widget - creates a state of _loginPageState
 class LoginPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -23,24 +17,32 @@ class LoginPage extends StatefulWidget {
   }
 }
 
+
 class _LoginPageState extends State<LoginPage> {
+  //value used for minimum padding and margin where applicable
   final _minimumPadding = 5.0;
 
+  //creating new objects for google sign in,
+  //firebase auth and SharedPrefereces
   final GoogleSignIn googleSignIn = GoogleSignIn();
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   SharedPreferences prefs;
 
+  //booleans to check whether data is loading is whether the user is logged in
   bool isLoading = false;
   bool isLoggedIn = false;
 
+  //new FirebaseUser object
   FirebaseUser currentUser;
 
+  //check whether the user is signed in whether the page is launched
   @override
   void initState() {
     super.initState();
     isSignedIn();
   }
 
+  //function to check whether the user is signed in
   void isSignedIn() async {
     this.setState(() {
       isLoading = true;
@@ -49,6 +51,8 @@ class _LoginPageState extends State<LoginPage> {
     prefs = await SharedPreferences.getInstance();
 
     isLoggedIn = await googleSignIn.isSignedIn();
+    //if the user is signed in already,
+    //generate the home page widget to replace login page
     if (isLoggedIn) {
       Navigator.push(
         context,
@@ -139,15 +143,18 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  //function to build body
   Widget _buildBody() {
+    //builds the body using the Column widget which lays out the child widgets vertically
     return Column(
-        //mainAxisAlignment: MainAxisAlignment.spaceAround,
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Container(
+            //gets the logo image
             child: getLogoImageAsset(),
           ),
+          //this Container widget nests the children widget to display the Google Sign in Button
           Container(
               child: Padding(
                   padding: EdgeInsets.all(_minimumPadding * 2),
@@ -155,6 +162,7 @@ class _LoginPageState extends State<LoginPage> {
                     margin: EdgeInsets.only(
                         left: _minimumPadding * 10,
                         right: _minimumPadding * 10),
+                    //package:flutter_auth_buttons/flutter_auth_buttons.dart is being used to generate
                     child: GoogleSignInButton(
                       darkMode: true,
                       onPressed: () {
@@ -171,7 +179,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
+    //build method builds the body of this widget by calling custom _buildBody function which fills the screen
     return Scaffold(
         backgroundColor: Colors.white,
         body: ConstrainedBox(
@@ -180,6 +188,7 @@ class _LoginPageState extends State<LoginPage> {
         ));
   }
 
+  //function to return the logo image of the  application
   Widget getLogoImageAsset() {
     AssetImage assetImage = AssetImage('images/internoteLogo.png');
 
