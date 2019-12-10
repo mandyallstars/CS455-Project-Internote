@@ -4,7 +4,7 @@ A collaborative note taking app for the students. The app has been created using
 
 ## Want to learn Flutter and Dart yourself?
 
-#Start with Flutter's hands-on exercises
+### Start with Flutter's hands-on exercises
 
 A few resources to get you started if this is your first Flutter project:
 
