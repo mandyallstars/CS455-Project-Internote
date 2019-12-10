@@ -56,7 +56,6 @@ class NotesBodyState extends State<NotesBody> {
       _noteTopicController.text = noteDoc['topic'];
       _noteContentController.text = noteDoc['content'];
       _lectureNumberController.text = noteDoc['lecture_no'];
-      ;
     }
   }
 

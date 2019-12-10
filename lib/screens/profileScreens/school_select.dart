@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_firestore/cloud_firestore.dart' as prefix0;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -153,6 +152,9 @@ class _SchoolListState extends State<SchoolList> {
   }
 
   Future<void> addSchoolToUser(String schoolName) async {
+
+    final thisUserDoc = await Firestore.instance.collection('users').document(this.loggedInUserId).get();
+
     final QuerySnapshot doesSchoolExist = await Firestore.instance
         .collection('schools')
         .where('school_name', isEqualTo: schoolName)
@@ -163,26 +165,59 @@ class _SchoolListState extends State<SchoolList> {
       DocumentReference docRef = await Firestore.instance.collection('schools').add({
         'school_name': _schoolNameController.text,
       });
-      Firestore.instance.collection('user_school_info').add({
-        'user_id': this.loggedInUserId,
-        'school_id': docRef.documentID,
-        'school_name': _schoolNameController.text,
-        'currently_selected': false
-      });
+
+      if(thisUserDoc['current_school_id'] == '00') {
+        Firestore.instance.collection('user_school_info').add({
+          'user_id': this.loggedInUserId,
+          'school_id': docRef.documentID,
+          'school_name': _schoolNameController.text,
+          'currently_selected': true
+        });
+
+        Firestore.instance.collection('users').document(this.loggedInUserId).updateData({
+          'current_school_id': docRef.documentID,
+        });
+
+      } else {
+        Firestore.instance.collection('user_school_info').add({
+          'user_id': this.loggedInUserId,
+          'school_id': docRef.documentID,
+          'school_name': _schoolNameController.text,
+          'currently_selected': false
+        });
+      }
+
     } else {
       final QuerySnapshot doesSchoolExistForUser = await Firestore.instance
           .collection('user_school_info')
+          .where('user_id', isEqualTo: this.loggedInUserId)
           .where('school_name', isEqualTo: schoolName)
           .getDocuments();
 
       final List<DocumentSnapshot> schoolExistUserDocument = doesSchoolExistForUser.documents;
       if(schoolExistUserDocument.length == 0) {
-        Firestore.instance.collection('user_school_info').add({
-          'user_id': this.loggedInUserId,
-          'school_id': schoolExistDocument[0].documentID,
-          'school_name': _schoolNameController.text,
-          'currently_selected': false
-        });
+
+        if(thisUserDoc['current_school_id'] == '00') {
+          Firestore.instance.collection('user_school_info').add({
+            'user_id': this.loggedInUserId,
+            'school_id': schoolExistDocument[0].documentID,
+            'school_name': _schoolNameController.text,
+            'currently_selected': true
+          });
+
+          Firestore.instance.collection('users').document(this.loggedInUserId).updateData({
+            'current_school_id': schoolExistDocument[0].documentID,
+          });
+
+        } else {
+          Firestore.instance.collection('user_school_info').add({
+            'user_id': this.loggedInUserId,
+            'school_id': schoolExistDocument[0].documentID,
+            'school_name': _schoolNameController.text,
+            'currently_selected': false
+          });
+        }
+
       }
     }
   }

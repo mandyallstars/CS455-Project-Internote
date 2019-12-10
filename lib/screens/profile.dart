@@ -1,18 +1,10 @@
 import 'dart:async';
-import 'dart:async' as prefix1;
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart' as prefix0;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:inter_note/screens/profileScreens/school_select.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:inter_note/main.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -38,8 +30,6 @@ class ProfileState extends State<Profile> {
 
   //final TextEditingController _nameController = TextEditingController();
   FocusNode _nameFocusNode;
-
-  int _thisSchoolCoursesCount = 10;
 
   bool isLoading = false;
 
@@ -82,7 +72,6 @@ class ProfileState extends State<Profile> {
           InkResponse(
               onTap: () {
                 handleSignOut();
-                ;
               },
               child: new Padding(
                   padding: const EdgeInsets.all(12.0),
