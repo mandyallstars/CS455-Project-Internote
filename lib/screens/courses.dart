@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -179,7 +177,6 @@ class CoursesState extends State<Courses> {
           icon: Icon(Icons.delete, color: Colors.grey),
           onPressed: () {
             deleteCourseForUser(document.documentID);
-
           },
         ),
         onTap: () {

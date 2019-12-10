@@ -39,7 +39,7 @@ class AddCourseState extends State<AddCourse> {
   final TextEditingController _timeToHourController = TextEditingController();
   final TextEditingController _timeToMinuteController = TextEditingController();
 
-  var _semesterValue = ["Spring Summer", "Fall", "Winter"];
+  var _semesterArray = ["Spring Summer", "Fall", "Winter"];
   var semesterValue;
   var amPmValueFrom;
   var amPmValueTo;
@@ -167,7 +167,7 @@ class AddCourseState extends State<AddCourse> {
                               isExpanded: true,
                               elevation: 10,
                               iconEnabledColor: Colors.black,
-                              items: _semesterValue
+                              items: _semesterArray
                                   .map((String semesterDropDownItem) {
                                 return DropdownMenuItem<String>(
                                   value: semesterDropDownItem,

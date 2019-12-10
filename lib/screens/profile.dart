@@ -242,24 +242,16 @@ class ProfileState extends State<Profile> {
   }
 
   Future<String> getSchoolName() async {
-//    final QuerySnapshot userSchoolResult = await Firestore.instance
-//        .collection('user_school_info')
-//        .where('user_id', isEqualTo: this.currentUserId)
-//        .where('currently_selected', isEqualTo: true)
-//        .getDocuments();
 
     final userSchoolResult = await Firestore.instance
         .collection('users')
         .document(this.currentUserId)
         .get();
 
-//    final List<DocumentSnapshot> userSchoolDocument =
-//        userSchoolResult.documents;
     if (userSchoolResult['current_school_id'] == '00') {
       return "Add School";
     } else {
-//      final currentSchoolName = userSchoolResult['school_name'];
-//      return currentSchoolName;
+
       final currentSchoolName = await Firestore.instance
           .collection('schools')
           .document(userSchoolResult['current_school_id'])
