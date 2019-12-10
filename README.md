@@ -1,10 +1,10 @@
-# inter_note
+# Internote
 
-A new Flutter application.
+A collaborative note taking app for the students. The app has been created using the flutter framework and Dart programming language.
 
-## Getting Started
+## Want to learn Flutter and Dart yourself?
 
-This project is a starting point for a Flutter application.
+### Start with Flutter's hands-on exercises
 
 A few resources to get you started if this is your first Flutter project:
 
