@@ -2,11 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:inter_note/screens/profile.dart';
 import 'package:inter_note/screens/courses.dart';
 import 'package:inter_note/screens/notes.dart';
-import 'package:inter_note/screens/notesScreens/notes_body.dart';
-import 'package:inter_note/screens/notesScreens/notes_list.dart';
-import 'package:inter_note/screens/profileScreens/school_select.dart';
-import 'package:inter_note/screens/coursesScreens/add_course.dart';
-import 'package:inter_note/loginpage.dart';
 
 
 class NavigationStack extends StatefulWidget {

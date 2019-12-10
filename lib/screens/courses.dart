@@ -23,8 +23,6 @@ class CoursesState extends State<Courses> {
 
   final _minimumPadding = 5.0;
 
-  int _coursesCount = 10;
-
   final TextEditingController _searchBarController = TextEditingController();
 
   @override

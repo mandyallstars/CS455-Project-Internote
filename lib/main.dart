@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:inter_note/loginpage.dart';
-import 'home_widget.dart';
 
 void main() => runApp(App());
 
@@ -28,10 +27,6 @@ class AppState extends State<App> {
           debugShowCheckedModeBanner: false,
           theme: ThemeData(primaryColor: Colors.blueAccent),
           home: LoginPage(),
-          routes: <String, WidgetBuilder> {
-            '/homePage': (BuildContext context) => HomePage(),
-            '/landingPage': (BuildContext context) => LoginPage()
-          }
         ));
   }
 }

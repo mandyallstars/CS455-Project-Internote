@@ -26,7 +26,6 @@ dependencies:
   fluttertoast:
   cached_network_image:
   flutter_auth_buttons:
-  intl:
   flutter:
     sdk: flutter
 

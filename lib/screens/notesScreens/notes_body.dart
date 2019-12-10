@@ -255,6 +255,8 @@ class NotesBodyState extends State<NotesBody> {
             'content': _noteContentController.text,
             'last_modified_time': DateTime.now()
           });
+
+          Navigator.of(context).pop();
         } else {
           Scaffold.of(context).showSnackBar(SnackBar(
               content: Text(
@@ -284,11 +286,14 @@ class NotesBodyState extends State<NotesBody> {
             'content': _noteContentController.text,
             'last_modified_time': DateTime.now()
           });
-        } else {
           Navigator.of(context).pop();
+
+        } else {
+
+          Navigator.of(context).pop();
+
         }
       }
-      Navigator.of(context).pop();
     } else {
       Scaffold.of(context).showSnackBar(SnackBar(
           content: Text(

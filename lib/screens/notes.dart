@@ -22,8 +22,6 @@ class NotesState extends State<Notes> {
 
   final _minimumPadding = 5.0;
 
-  int _count = 10;
-
   final TextEditingController _searchBarController = TextEditingController();
   final TextEditingController _semesterYearController = TextEditingController();
 
@@ -232,11 +230,11 @@ class NotesState extends State<Notes> {
       child: ListTile(
         title: Text(
           document['course_number'],
-          style: TextStyle(color: Colors.black),
+          style: TextStyle(color: Colors.black, fontSize: 20),
         ),
         subtitle: Text(
           document['course_name'],
-          style: TextStyle(color: Colors.black),
+          style: TextStyle(color: Colors.black, fontSize: 13),
         ),
         trailing: Icon(Icons.arrow_forward_ios, color: Colors.blue),
         onTap: () {
