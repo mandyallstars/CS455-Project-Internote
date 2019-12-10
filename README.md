@@ -1,4 +1,4 @@
-# inter_note
+# Internote
 
 A new Flutter application.
 
