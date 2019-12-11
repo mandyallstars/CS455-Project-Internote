@@ -11,7 +11,7 @@ class Courses extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
+    //creates a state of CoursesState with logged in user's ID as argument
     return CoursesState(loggedInUserId: this.currentUserId);
   }
 }
@@ -21,6 +21,7 @@ class CoursesState extends State<Courses> {
 
   CoursesState({Key key, @required this.loggedInUserId});
 
+  //varaibe to impelement minimum padding/margin where applicable
   final _minimumPadding = 5.0;
 
   final TextEditingController _searchBarController = TextEditingController();
@@ -32,10 +33,10 @@ class CoursesState extends State<Courses> {
       appBar: AppBar(
         title: Text('Courses'),
       ),
-      body: getCoursesPage(),
+      body: getCoursesPage(), //creates the body of the course page
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          debugPrint("FAB pressed");
+          //takes to new form to add course to user's profile for current school
           navigateToAddCourse('Add Course', this.loggedInUserId, 'New');
         },
         tooltip: 'Add Course',
@@ -58,6 +59,7 @@ class CoursesState extends State<Courses> {
               children: <Widget>[
                 searchBar(),
                 coursesHeading(),
+                //create blank body if there are no courses
                 Container(
                   color: Colors.white,
                 )
@@ -69,6 +71,7 @@ class CoursesState extends State<Courses> {
               children: <Widget>[
                 searchBar(),
                 coursesHeading(),
+                //builds a list of courses for user in current school
                 getThisSchoolCourseList(document['current_school_id']),
               ],
             );
@@ -78,6 +81,8 @@ class CoursesState extends State<Courses> {
     );
   }
 
+  //returns the UI for seach bar
+  //search bar does not work
   Padding searchBar() {
     return Padding(
       padding: EdgeInsets.only(top: _minimumPadding, bottom: _minimumPadding),
@@ -86,9 +91,7 @@ class CoursesState extends State<Courses> {
         style: TextStyle(fontSize: 15.0),
         decoration: InputDecoration(
             contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-            prefixIcon: IconButton(
-              icon: Icon(Icons.search),
-            ),
+            prefixIcon: Icon(Icons.search),
             suffixIcon: IconButton(
               icon: Icon(Icons.clear),
               onPressed: () {
@@ -107,6 +110,7 @@ class CoursesState extends State<Courses> {
     );
   }
 
+  //returns the UI for course heading
   Padding coursesHeading() {
     return Padding(
         padding: EdgeInsets.only(top: _minimumPadding, bottom: _minimumPadding),
@@ -119,6 +123,7 @@ class CoursesState extends State<Courses> {
         ));
   }
 
+  //returns the list of courses in user profile for current school
   StreamBuilder getThisSchoolCourseList(String currentSchoolId) {
     return StreamBuilder(
       stream: Firestore.instance
@@ -135,6 +140,8 @@ class CoursesState extends State<Courses> {
             children: <Widget>[
               ListTile(
                 title: Text(
+                  //if no courses in users profile for current school
+                  //then supposed to return this - does not  work
                   "No Courses added to this School",
                   style: TextStyle(color: Colors.blueGrey, fontSize: 15.0),
                   textDirection: TextDirection.ltr,
@@ -150,6 +157,7 @@ class CoursesState extends State<Courses> {
               shrinkWrap: true,
               physics: ScrollPhysics(),
               itemCount: snapshot.data.documents.length,
+              //builds each item of the list of courses
               itemBuilder: (context, index) => buildThisSchoolCourseItem(
                   context, snapshot.data.documents[index]));
         }
@@ -157,6 +165,7 @@ class CoursesState extends State<Courses> {
     );
   }
 
+  //returns a single item of the course in the form of a card
   Card buildThisSchoolCourseItem(
       BuildContext context, DocumentSnapshot document) {
     return Card(
@@ -174,10 +183,12 @@ class CoursesState extends State<Courses> {
         trailing: IconButton(
           icon: Icon(Icons.delete, color: Colors.grey),
           onPressed: () {
+            //deletes the course from user's profile for the current school
             deleteCourseForUser(document.documentID);
           },
         ),
         onTap: () {
+          //takes user to course form where the user can edit the details of the course
           navigateToAddCourse(
               'Edit Course', this.loggedInUserId, document['course_id']);
         },
@@ -185,6 +196,7 @@ class CoursesState extends State<Courses> {
     );
   }
 
+  //function to delete the course from user's profile for current school
   Future<void> deleteCourseForUser(String courseDocumentID) async {
     await Firestore.instance.collection('user_course_info').document(courseDocumentID).delete();
   }

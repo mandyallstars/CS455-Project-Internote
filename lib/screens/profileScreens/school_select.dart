@@ -10,7 +10,7 @@ class SchoolList extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
+    //creates a state for _SchoolListState with title and ID of the logged in user as argument
     return _SchoolListState(this.appBarTitle, this.loggedInUserId);
   }
 }
@@ -23,8 +23,10 @@ class _SchoolListState extends State<SchoolList> {
 
   final _minimumPadding = 5.0;
 
+  //global key in this file for the form
   final _formKey = GlobalKey<FormState>();
 
+  //text controller for the school name
   TextEditingController _schoolNameController = TextEditingController();
 
   @override
@@ -43,9 +45,11 @@ class _SchoolListState extends State<SchoolList> {
                 navigateToPreviousScreen();
               },
             )),
+        //body shows current schools in user profile
         body: getSchoolPage(),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
+            //when user taps on + button, alert dialog is created to get new school name
             showDialog(
               context: context,
               builder: (BuildContext context) {
@@ -57,12 +61,19 @@ class _SchoolListState extends State<SchoolList> {
                       children: <Widget>[
                         Padding(
                           padding: EdgeInsets.all(_minimumPadding * 1.5),
+                          //text form field to get school name input
                           child: TextFormField(
                             controller: _schoolNameController,
                             textAlign: TextAlign.center,
                             style: TextStyle(fontSize: 20),
                             decoration:
                                 InputDecoration(hintText: "School Name"),
+                            //validator validates the field - value is the value currently in the field
+                            validator: (value) {
+                              if(value.isEmpty) {
+                                return '*Required';
+                              }
+                            },
                           ),
                         ),
                         Padding(
@@ -80,9 +91,12 @@ class _SchoolListState extends State<SchoolList> {
                                   textColor: Colors.white,
                                   splashColor: Colors.green,
                                   onPressed: () {
-                                    addSchoolToUser(_schoolNameController.text);
-                                    Navigator.of(context, rootNavigator: true)
-                                        .pop();
+                                    //school only added to the user if form is validated
+                                    if(_formKey.currentState.validate()) {
+                                      addSchoolToUser(_schoolNameController.text);
+                                      Navigator.of(context, rootNavigator: true)
+                                          .pop();
+                                    }
                                   },
                                 ),
                               ),
@@ -122,6 +136,7 @@ class _SchoolListState extends State<SchoolList> {
     );
   }
 
+  //function to display the current schools in the user profile
   Container getSchoolPage() {
     return Container(
       child: StreamBuilder(
@@ -129,6 +144,7 @@ class _SchoolListState extends State<SchoolList> {
           //snapshots(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
+              //display blank container if there is no school
               return Container(
                 color: Colors.white,
               );
@@ -142,6 +158,7 @@ class _SchoolListState extends State<SchoolList> {
                 shrinkWrap: true,
                 physics: ScrollPhysics(),
                   padding: EdgeInsets.only(top: _minimumPadding, bottom: _minimumPadding),
+                  //builds the school items in the profile
                   itemBuilder: (context, index) => buildSchoolItem(context, snapshot.data.documents[index]),
                 itemCount: snapshot.data.documents.length,
               );
@@ -151,6 +168,7 @@ class _SchoolListState extends State<SchoolList> {
     );
   }
 
+  //function to add the school to user profile
   Future<void> addSchoolToUser(String schoolName) async {
 
     final thisUserDoc = await Firestore.instance.collection('users').document(this.loggedInUserId).get();
@@ -161,11 +179,17 @@ class _SchoolListState extends State<SchoolList> {
         .getDocuments();
 
     final List<DocumentSnapshot> schoolExistDocument = doesSchoolExist.documents;
+
+    //check if the school exists in the main school list at all
     if (schoolExistDocument.length == 0) {
+
+      //add school to main school list if does not exist
       DocumentReference docRef = await Firestore.instance.collection('schools').add({
         'school_name': _schoolNameController.text,
       });
 
+      //if user does not have any schools in profile,
+      // make this the currently selected school for user
       if(thisUserDoc['current_school_id'] == '00') {
         Firestore.instance.collection('user_school_info').add({
           'user_id': this.loggedInUserId,
@@ -179,6 +203,9 @@ class _SchoolListState extends State<SchoolList> {
         });
 
       } else {
+        //if user already has a current school in profile,
+        //then just add school to profile and
+        //leave the onus of selecting it as current school on user
         Firestore.instance.collection('user_school_info').add({
           'user_id': this.loggedInUserId,
           'school_id': docRef.documentID,
@@ -188,6 +215,8 @@ class _SchoolListState extends State<SchoolList> {
       }
 
     } else {
+
+      //this code is invoked if the school already exists in the school list
       final QuerySnapshot doesSchoolExistForUser = await Firestore.instance
           .collection('user_school_info')
           .where('user_id', isEqualTo: this.loggedInUserId)
@@ -195,9 +224,13 @@ class _SchoolListState extends State<SchoolList> {
           .getDocuments();
 
       final List<DocumentSnapshot> schoolExistUserDocument = doesSchoolExistForUser.documents;
+
+      //check if the school already exists for  the user
       if(schoolExistUserDocument.length == 0) {
 
         if(thisUserDoc['current_school_id'] == '00') {
+          //if user does not have any schools in profile,
+          //make this the currently selected school for user
           Firestore.instance.collection('user_school_info').add({
             'user_id': this.loggedInUserId,
             'school_id': schoolExistDocument[0].documentID,
@@ -210,6 +243,9 @@ class _SchoolListState extends State<SchoolList> {
           });
 
         } else {
+          //if user already has a current school in profile,
+          //then just add school to profile and
+          //leave the onus of selecting it as current school on user
           Firestore.instance.collection('user_school_info').add({
             'user_id': this.loggedInUserId,
             'school_id': schoolExistDocument[0].documentID,
@@ -218,13 +254,22 @@ class _SchoolListState extends State<SchoolList> {
           });
         }
 
+      } else {
+        //if same school exists for the  user, then display a snackbar with info
+        Scaffold.of(context).showSnackBar(SnackBar(
+            content: Text(
+              'Same school already exists in profile',
+              textAlign: TextAlign.center,
+            )));
       }
     }
   }
 
 
+  //function to build a single item with school name
   Widget buildSchoolItem(BuildContext context, DocumentSnapshot document) {
 
+    //checks if the document being passed has currently selected as true or not
     final bool selectedSchool = document['currently_selected'];
 
     return ListTile(
@@ -235,6 +280,8 @@ class _SchoolListState extends State<SchoolList> {
         softWrap: false,
         overflow: TextOverflow.ellipsis,
       ),
+      //trailing icon is green check mark if the school is currently selected by user,
+      //otherwise no trailing icon
       trailing: Icon(
         selectedSchool ? Icons.check : null,
         color: selectedSchool ? Colors.green : null,
@@ -242,6 +289,7 @@ class _SchoolListState extends State<SchoolList> {
       ),
       onTap: () {
         setState(() {
+          //change the currently selected for user to the school that user taps on
           setCurrentSchool(document);
         });
       },
@@ -249,7 +297,9 @@ class _SchoolListState extends State<SchoolList> {
 
   }
 
+  //function to change the currently selected school for user
   Future<void> setCurrentSchool(DocumentSnapshot document) async {
+    //gets a list of all schools for the user in the profile as list of the firestore documents
     final QuerySnapshot allSchoolsForUser = await Firestore.instance
         .collection('user_school_info')
         .where('user_id', isEqualTo: this.loggedInUserId)
@@ -257,18 +307,24 @@ class _SchoolListState extends State<SchoolList> {
 
     final List<DocumentSnapshot> allSchoolsForUserDocument =
         allSchoolsForUser.documents;
+    //if there are any schools in the profile then the following code is run
     if(allSchoolsForUserDocument.length != 0) {
+      //first currently selected for all the schools in user profile is set to false
       allSchoolsForUserDocument.forEach((doc) {
         Firestore.instance.collection('user_school_info').document(doc.documentID).updateData(
             {
               'currently_selected': false,
             });
       });
+
+      //current selected is set to true for the school that the user tapped on
       Firestore.instance.collection('user_school_info').document(document.documentID).updateData(
           {
             'currently_selected': true,
           });
       final currentSchoolDoc = await Firestore.instance.collection('user_school_info').document(document.documentID).get();
+
+      //current school id in the users profile is changed to the school that user tapped on
       Firestore.instance.collection('users').document(this.loggedInUserId).updateData({
         'current_school_id': currentSchoolDoc['school_id'],
       });

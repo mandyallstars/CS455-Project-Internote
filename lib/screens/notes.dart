@@ -11,6 +11,7 @@ class Notes extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
+    //creates a state of NotesState with logged in user's ID as argument
     return NotesState(loggedInUserId: this.currentUserId);
   }
 }
@@ -20,28 +21,33 @@ class NotesState extends State<Notes> {
 
   NotesState({Key key, @required this.loggedInUserId});
 
+  //variabe to impelement minimum padding/margin where applicable
   final _minimumPadding = 5.0;
 
+  //controllers for form elements in this page UI
   final TextEditingController _searchBarController = TextEditingController();
   final TextEditingController _semesterYearController = TextEditingController();
 
+  var semesterValue;
+
+  //variable to store current school ID
+  var currentSchoolId;
+
+  //array for semester drop dow
   var _semesterArray = [
     'Fall',
     'Winter',
     'Spring Summer',
   ];
 
-  var semesterValue;
-
-  var currentSchoolId;
-
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    //user's current school ID is initialized when the page is rendered
     getCurrentSchoolId();
   }
 
+  //function to initialize the currentSchoolID for the user
   Future<void> getCurrentSchoolId() async {
     final currentUserDoc = await Firestore.instance
         .collection('users')
@@ -61,6 +67,7 @@ class NotesState extends State<Notes> {
     );
   }
 
+  //creates the body for the page
   Container getNotesMainPage() {
     return Container(
       margin: EdgeInsets.all(_minimumPadding * 2),
@@ -71,6 +78,7 @@ class NotesState extends State<Notes> {
             .snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
+            //return blank page with basic elements if there is no data for user
             return ListView(
               children: <Widget>[
                 searchBar(),
@@ -86,6 +94,7 @@ class NotesState extends State<Notes> {
               children: <Widget>[
                 searchBar(),
                 coursesHeading(),
+                //creates a list of courses for user for the current school
                 thisSemesterUserCourseList(document['current_school_id']),
               ],
             );
@@ -95,6 +104,8 @@ class NotesState extends State<Notes> {
     );
   }
 
+  //creates search bar UI
+  //search bar does not work
   Padding searchBar() {
     return Padding(
       padding: EdgeInsets.only(top: _minimumPadding, bottom: _minimumPadding),
@@ -103,9 +114,7 @@ class NotesState extends State<Notes> {
         style: TextStyle(fontSize: 15.0),
         decoration: InputDecoration(
             contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-            prefixIcon: IconButton(
-              icon: Icon(Icons.search),
-            ),
+            prefixIcon: Icon(Icons.search),
             suffixIcon: IconButton(
               icon: Icon(Icons.clear),
               onPressed: () {
@@ -124,6 +133,7 @@ class NotesState extends State<Notes> {
     );
   }
 
+  //creates course heading UI element
   Padding coursesHeading() {
     return Padding(
         padding: EdgeInsets.only(top: _minimumPadding, bottom: _minimumPadding),
@@ -136,6 +146,8 @@ class NotesState extends State<Notes> {
         ));
   }
 
+  //widget to create a drop down and text field to get semester info from user
+  //Removed from UI because it was not working
   Padding getSemesterInfo() {
     return Padding(
       padding: EdgeInsets.fromLTRB(_minimumPadding * 3, _minimumPadding,
@@ -184,6 +196,7 @@ class NotesState extends State<Notes> {
     );
   }
 
+  //function to create a list of courses in user's profile for current school
   StreamBuilder thisSemesterUserCourseList(String currentSchoolId) {
     return StreamBuilder(
       stream: Firestore.instance
@@ -200,6 +213,7 @@ class NotesState extends State<Notes> {
             children: <Widget>[
               ListTile(
                 title: Text(
+                  //supposed to show if there are no courses but not working
                   "No Courses added to this school",
                   style: TextStyle(color: Colors.blueGrey, fontSize: 15.0),
                   textDirection: TextDirection.ltr,
@@ -215,6 +229,7 @@ class NotesState extends State<Notes> {
               shrinkWrap: true,
               physics: ScrollPhysics(),
               itemCount: snapshot.data.documents.length,
+              //build items in courses list
               itemBuilder: (context, index) => buildThisSchoolCourseItem(
                   context, snapshot.data.documents[index]));
         }
@@ -222,6 +237,7 @@ class NotesState extends State<Notes> {
     );
   }
 
+  //returns a single item in the courses list
   Card buildThisSchoolCourseItem(
       BuildContext context, DocumentSnapshot document) {
     return Card(
@@ -238,39 +254,13 @@ class NotesState extends State<Notes> {
         ),
         trailing: Icon(Icons.arrow_forward_ios, color: Colors.blue),
         onTap: () {
+          //takes to the list of notes for this course when user taps on course card
           navigateToNotesList(
               document['course_number'], document['course_id']);
         },
       ),
     );
   }
-
-
-//  ListView getCoursesList() {
-//    return ListView.builder(
-//      scrollDirection: Axis.vertical,
-//      shrinkWrap: true,
-//      physics: ScrollPhysics(),
-//      itemCount: _count,
-//      itemBuilder: (BuildContext context, int position) {
-//        return Card(
-//          color: Colors.white,
-//          elevation: 2.5,
-//          child: ListTile(
-//            title: Text(
-//              "Title Placeholder",
-//              style: TextStyle(color: Colors.black),
-//            ),
-//            trailing: Icon(Icons.arrow_forward_ios, color: Colors.blue),
-//            onTap: () {
-//              debugPrint("ListTile Tapped");
-//              navigateToNotesList('This Course Title');
-//            },
-//          ),
-//        );
-//      },
-//    );
-//  }
 
   void navigateToNotesList(String appBarTitle, String courseId) {
     Navigator.push(context, MaterialPageRoute(builder: (context) {

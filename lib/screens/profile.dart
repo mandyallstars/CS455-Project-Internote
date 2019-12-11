@@ -11,6 +11,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Profile extends StatefulWidget {
   final String currentUserId;
 
+  //takes in user ID of the logged in user as argument
   Profile({Key key, @required this.currentUserId}) : super(key: key);
 
   @override
@@ -22,30 +23,20 @@ class Profile extends StatefulWidget {
 class ProfileState extends State<Profile> {
   final String currentUserId;
 
+  //takes in user ID of the logged in user as argument
   ProfileState({Key key, @required this.currentUserId});
 
+  //google sign in object to handle sign out later
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
+  //variabe to impelement minimum padding/margin where applicable
   final _minimumPadding = 5.0;
 
-  //final TextEditingController _nameController = TextEditingController();
   FocusNode _nameFocusNode;
 
   bool isLoading = false;
 
-//  @override
-//  void initState() {
-//    super.initState();
-//  }
-
-//  @override
-//  void dispose() {
-//    // Clean up the focus node when the Form is disposed.
-//    _nameFocusNode.dispose();
-//
-//    super.dispose();
-//  }
-
+  //function to handle sign out
   Future<Null> handleSignOut() async {
     this.setState(() {
       isLoading = true;
@@ -59,33 +50,35 @@ class ProfileState extends State<Profile> {
       isLoading = false;
     });
 
+    //remove everything from navigation stack
     SystemNavigator.pop();
   }
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Scaffold(
       appBar: AppBar(
         title: Text('Profile'),
         actions: <Widget>[
           InkResponse(
-              onTap: () {
-                handleSignOut();
-              },
-              child: new Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Row(
-                    children: <Widget>[
-                      Icon(Icons.exit_to_app, size: 30),
-                      Container(
-                        margin: EdgeInsets.only(left: _minimumPadding),
-                      ),
-                      Center(
-                        child: Text("Sign Out", style: TextStyle(fontSize: 20)),
-                      ),
-                    ],
-                  ))),
+            child: new Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Row(
+                  children: <Widget>[
+                    Icon(Icons.exit_to_app, size: 30),
+                    Container(
+                      margin: EdgeInsets.only(left: _minimumPadding),
+                    ),
+                    Center(
+                      child: Text("Sign Out", style: TextStyle(fontSize: 20)),
+                    ),
+                  ],
+                )),
+            onTap: () {
+              //signs out the user when user presses Sign Out button
+              handleSignOut();
+            },
+          ),
         ],
       ),
       body: getProfilePage(),
@@ -100,10 +93,10 @@ class ProfileState extends State<Profile> {
             .collection('users')
             .document(this.currentUserId)
             .snapshots(),
-        //stream: Firestore.instance.collection('users').where('id', isEqualTo: this.currentUserId).snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return Center(
+              //show progress indicator if there is no data for user
               child: CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
               ),
@@ -114,6 +107,8 @@ class ProfileState extends State<Profile> {
             return ListView(
               children: <Widget>[
                 Material(
+                  //show Cached image of the user if there is a photoUrl in the profile,
+                  //else show a placeholder
                   child: document['photoUrl'] != null
                       ? CachedNetworkImage(
                           placeholder: (context, url) => Container(
@@ -129,11 +124,12 @@ class ProfileState extends State<Profile> {
                           imageUrl: document['photoUrl'],
                           width: 125,
                           height: 125)
-                      : getProfileImageAsset(),
+                      : getProfileImageAsset(), //placeholder image asset
                 ),
                 //getProfileImageAsset(),
                 Divider(color: Colors.black54),
                 TextFormField(
+                  //Text form field to display and change user name in profile
                   initialValue: userDisplayName,
                   focusNode: _nameFocusNode,
                   style: TextStyle(fontSize: 20),
@@ -154,6 +150,7 @@ class ProfileState extends State<Profile> {
                   },
                 ),
                 Divider(color: Colors.white),
+                //display the information for the currently selected school
                 getCurrentSchoolInfo(),
                 Padding(
                     padding: EdgeInsets.only(
@@ -167,6 +164,7 @@ class ProfileState extends State<Profile> {
                           color: Colors.black,
                           fontWeight: FontWeight.bold),
                     )),
+                //display the  courses for currently selected school in list form
                 getThisSchoolCourses(document['current_school_id'])
               ],
             );
@@ -176,16 +174,20 @@ class ProfileState extends State<Profile> {
     );
   }
 
+  //function to display the UI for tappable school information
   InkWell getCurrentSchoolInfo() {
     return InkWell(
       customBorder: Border(
+        //supposed to show border around the child but not working
           top: BorderSide(width: 5.0, color: Colors.black),
           bottom: BorderSide(width: 5.0, color: Colors.black)),
       child: Container(
         child: Padding(
           padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
+          //UI elements are layed out using Row which displays child elements horizontally
           child: Row(
             children: <Widget>[
+              //leading school icon
               Icon(
                 Icons.school,
                 size: 20,
@@ -198,11 +200,12 @@ class ProfileState extends State<Profile> {
                   textDirection: TextDirection.ltr,
                 ),
               ),
+              //Displays the current selected school for user. Displays Add School if there is no school in profile
               Expanded(
                   child: Container(
                 margin: EdgeInsets.only(right: _minimumPadding * 2),
                 child: FutureBuilder(
-                  future: getSchoolName(),
+                  future: getSchoolName(), //retirves currently selected school
                   initialData: "Add School",
                   builder: (BuildContext context, AsyncSnapshot<String> text) {
                     return Text(
@@ -215,6 +218,7 @@ class ProfileState extends State<Profile> {
                   },
                 ),
               )),
+              //trailing icon to indicate the user can tap on this to go into sub page
               Icon(
                 Icons.arrow_forward_ios,
                 size: 20,
@@ -225,22 +229,23 @@ class ProfileState extends State<Profile> {
         ),
       ),
       onTap: () {
+        //go to school page when tapped on this UI
         navigateToSchoolList('Edit School', this.currentUserId);
       },
     );
   }
 
+  //returns the currently selected school for the user
   Future<String> getSchoolName() async {
-
     final userSchoolResult = await Firestore.instance
         .collection('users')
         .document(this.currentUserId)
         .get();
 
     if (userSchoolResult['current_school_id'] == '00') {
+      //returns Add School if no school in profile
       return "Add School";
     } else {
-
       final currentSchoolName = await Firestore.instance
           .collection('schools')
           .document(userSchoolResult['current_school_id'])
@@ -249,7 +254,7 @@ class ProfileState extends State<Profile> {
     }
   }
 
-
+  //function to display UI of the courses in logged in user's profile for the currently selected school
   Container getThisSchoolCourses(String currentSchoolID) {
     return Container(
       child: StreamBuilder(
@@ -267,6 +272,7 @@ class ProfileState extends State<Profile> {
                 children: <Widget>[
                   ListTile(
                     title: Text(
+                      //supposed to display this text if there are no courses but not working
                       "Add courses to this school in Courses tab",
                       style: TextStyle(color: Colors.blueGrey, fontSize: 15.0),
                       textDirection: TextDirection.ltr,
@@ -283,9 +289,10 @@ class ProfileState extends State<Profile> {
                   physics: ScrollPhysics(),
                   itemCount: snapshot.data.documents.length,
                   separatorBuilder: (context, index) => Divider(
-                    color: Colors.black,
-                    thickness: 0.2,
-                  ),
+                        color: Colors.black,
+                        thickness: 0.2,
+                      ),
+                  //builds each item of the list of courses
                   itemBuilder: (context, index) =>
                       buildCourseItem(context, snapshot.data.documents[index]));
             }
@@ -293,6 +300,7 @@ class ProfileState extends State<Profile> {
     );
   }
 
+  //function to build a single list item of courses
   Widget buildCourseItem(BuildContext context, DocumentSnapshot document) {
     return ListTile(
       title: Text(
@@ -312,6 +320,7 @@ class ProfileState extends State<Profile> {
     );
   }
 
+  //function to return the placeholder image for profile picture
   Widget getProfileImageAsset() {
     AssetImage assetImage = AssetImage('images/profilePhotoPlaceholder.png');
 
@@ -326,6 +335,7 @@ class ProfileState extends State<Profile> {
     );
   }
 
+  //function to navigate to the School Selection/Adding page
   void navigateToSchoolList(String appBarTitle, String loggedInUserId) {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return SchoolList(appBarTitle, loggedInUserId);

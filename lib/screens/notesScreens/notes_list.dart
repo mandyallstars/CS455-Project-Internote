@@ -12,7 +12,7 @@ class NotesList extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
+    //creates a state of the NotesListState with course ID as argument
     return NotesListState(appBarTitle, this.courseId);
   }
 }
@@ -24,6 +24,7 @@ class NotesListState extends State<NotesList> {
 
   NotesListState(this.appBarTitle, this.courseId);
 
+  //variabe to impelement minimum padding/margin where applicable
   final _minimumPadding = 5.0;
 
   final TextEditingController _searchBarController = TextEditingController();
@@ -48,7 +49,7 @@ class NotesListState extends State<NotesList> {
         body: getNotesList(),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            debugPrint("FAB pressed");
+            //takes user to the notes body page to add a new note to this course
             navigateToNotesBody('New Note', 'New', this.courseId);
           },
           tooltip: 'Add Note',
@@ -58,6 +59,7 @@ class NotesListState extends State<NotesList> {
     );
   }
 
+  //creates a list of notes for this course
   Container getNotesList() {
     return Container(
       margin: EdgeInsets.all(_minimumPadding * 2),
@@ -74,6 +76,7 @@ class NotesListState extends State<NotesList> {
                   notesHeading(),
                   ListTile(
                     title: Text(
+                      //supposed to show this if there are not notes in this course but does not work
                       "Add Notes to this course",
                       style: TextStyle(color: Colors.blueGrey, fontSize: 15.0),
                       textDirection: TextDirection.ltr,
@@ -96,6 +99,7 @@ class NotesListState extends State<NotesList> {
                   shrinkWrap: true,
                   physics: ScrollPhysics(),
                   itemCount: snapshot.data.documents.length,
+                  //builds the  list of notes for this course
                   itemBuilder: (context, index) =>
                       buildNotesItem(context, snapshot.data.documents[index])),
                 ],
@@ -106,6 +110,8 @@ class NotesListState extends State<NotesList> {
     );
   }
 
+  //returns the UI for the search bar
+  //search bar is not working
   Padding searchBar() {
     return Padding(
       padding: EdgeInsets.only(top: _minimumPadding, bottom: _minimumPadding),
@@ -114,9 +120,7 @@ class NotesListState extends State<NotesList> {
         style: TextStyle(fontSize: 15.0),
         decoration: InputDecoration(
             contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-            prefixIcon: IconButton(
-              icon: Icon(Icons.search),
-            ),
+            prefixIcon: Icon(Icons.search),
             suffixIcon: IconButton(
               icon: Icon(Icons.clear),
               onPressed: () {
@@ -135,6 +139,7 @@ class NotesListState extends State<NotesList> {
     );
   }
 
+  //returns the Notes heading UI element
   Padding notesHeading() {
     return Padding(
         padding: EdgeInsets.only(top: _minimumPadding, bottom: _minimumPadding),
@@ -147,11 +152,14 @@ class NotesListState extends State<NotesList> {
         ));
   }
 
+  //returns a single item of note card in the notes list
   Card buildNotesItem(BuildContext context, DocumentSnapshot document) {
+
+    //varaible to store the card title
     var noteTitle = "Lecture " + document['lecture_no'] + " - " + document['topic'];
 
-
-
+    //parses the timestamp information retrieved from firestore
+    //showed in the card subtitle
     String lastModifiedTime = intl.DateFormat('MMM dd, yyyy HH:MM:ss').format(document['last_modified_time'].toDate());
 
     return Card(
@@ -160,6 +168,8 @@ class NotesListState extends State<NotesList> {
       child: ListTile(
         title: Text(
           noteTitle,
+          softWrap: false,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(color: Colors.black, fontSize: 20),
         ),
         subtitle: Text(
@@ -169,10 +179,12 @@ class NotesListState extends State<NotesList> {
         trailing: IconButton(
           icon: Icon(Icons.delete, color: Colors.grey),
           onPressed: () {
+            //note is removed from this course if the delete button is tapped
             deleteThisNote(document.documentID);
           },
         ),
         onTap: () {
+          //user is taken to the notes body page for the note when user taps on a card
           navigateToNotesBody(
               noteTitle, document.documentID, this.courseId);
         },
@@ -180,10 +192,12 @@ class NotesListState extends State<NotesList> {
     );
   }
 
+  //function to delete the note from course
   Future<void> deleteThisNote(String noteDocumentID) async {
     await Firestore.instance.collection('notes').document(noteDocumentID).delete();
   }
 
+  //function to navigate to note body page with note ID and course ID as argument
   void navigateToNotesBody(String notesBodyBarTitle, String noteId, String courseId) {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return NotesBody(notesBodyBarTitle, noteId, courseId);

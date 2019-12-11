@@ -67,6 +67,7 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
+  //function to handle sign in of the user
   Future<Null> handleSignIn() async {
     prefs = await SharedPreferences.getInstance();
 
@@ -74,14 +75,18 @@ class _LoginPageState extends State<LoginPage> {
       isLoading = true;
     });
 
+    //google handles sign in of the user
     GoogleSignInAccount googleUser = await googleSignIn.signIn();
     GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
+    //user's access token and id token are retrieved
     final AuthCredential credential = GoogleAuthProvider.getCredential(
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
     );
 
+    //user is signed into firebase using google's credentials
+    //this is an integration between, google sign in and firebase authorization
     FirebaseUser firebaseUser =
         (await firebaseAuth.signInWithCredential(credential)).user;
 
@@ -92,6 +97,7 @@ class _LoginPageState extends State<LoginPage> {
           .where('id', isEqualTo: firebaseUser.uid)
           .getDocuments();
       final List<DocumentSnapshot> documents = result.documents;
+
       if (documents.length == 0) {
         // Update data to server if new user
         Firestore.instance
@@ -114,8 +120,8 @@ class _LoginPageState extends State<LoginPage> {
         await prefs.setString('current_school_id', "00");
       } else {
 
-       // stream: Firestore.instance.collection('users').document(this.currentUserId).snapshots();
-
+        //if not new user
+        //update photo URL for the user in profile
         Firestore.instance.collection('users').document('$firebaseUser.uid').updateData(
             {
               'photoUrl': firebaseUser.photoUrl,
@@ -131,6 +137,8 @@ class _LoginPageState extends State<LoginPage> {
       this.setState(() {
         isLoading = false;
       });
+
+      //generate the home page widget to replace login page
       Navigator.push(
           context,
           MaterialPageRoute(
@@ -163,9 +171,11 @@ class _LoginPageState extends State<LoginPage> {
                         left: _minimumPadding * 10,
                         right: _minimumPadding * 10),
                     //package:flutter_auth_buttons/flutter_auth_buttons.dart is being used to generate
+                    //sign in button for google as per Google's convention
                     child: GoogleSignInButton(
                       darkMode: true,
                       onPressed: () {
+                        //this method is called when sign in button is pressed
                         handleSignIn();
                       },
                     ),

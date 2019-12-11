@@ -11,7 +11,8 @@ class NavigationStack extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
+
+    //creates a navigationStackState with the page as it's argument
     return NavigationStackState(this.child);
   }
 
@@ -26,7 +27,7 @@ class NavigationStackState extends State<NavigationStack> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
+    //creates a navigation stack for the page passed as argument
     return Navigator(
         onGenerateRoute: (RouteSettings settings) {
           return MaterialPageRoute(
@@ -49,6 +50,7 @@ class HomePage extends StatefulWidget {
   HomePage({Key key, @required this.currentUserId}) : super(key: key);
 
   @override
+  //create state of HomePageState with the logged in user ID
   _HomePageState createState() => _HomePageState(currentUserId: this.currentUserId);
 }
 
@@ -67,23 +69,26 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
+  //index to store the currently selected item in bottom navigation bar
   int _currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: SafeArea(
+          //create an indexed stack to handle navigation with bottom navigation bar
           child: IndexedStack(
             index: _currentIndex,
             children: <Widget>[
+              //generate the body depending on which item is selected
+              //in bottom navigation bar
               NavigationStack(child: Profile(currentUserId: this.currentUserId)),
               NavigationStack(child: Courses(currentUserId: this.currentUserId)),
               NavigationStack(child: Notes(currentUserId: this.currentUserId)),
             ],
           ),
         ),
-        //body: callPage(_currentIndex),
-        //body: _children[_currentIndex],
+        //UI for bottom navigation bar
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: _currentIndex,
           onTap: (int index) {
